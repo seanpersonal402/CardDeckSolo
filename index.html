@@ -51,13 +51,18 @@
   #play-screen h2 { text-align: center; margin-bottom: 20px; }
   .piles-container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
   .pile-area { display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 120px; }
-  .drawn-card { width: 90px; height: 126px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: bold; box-shadow: 2px 4px 10px rgba(0,0,0,0.5); min-height: 126px; }
+  .drawn-card { width: 90px; height: 126px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: bold; box-shadow: 2px 4px 10px rgba(0,0,0,0.5); min-height: 126px; overflow: hidden; }
   .drawn-card.hearts, .drawn-card.diamonds { color: #c0392b; }
   .drawn-card.spades, .drawn-card.clubs { color: #1a1a1a; }
   .drawn-card.empty-slot { background: transparent; box-shadow: none; border: 2px dashed rgba(255,255,255,0.2); }
-  .pile-stack { width: 90px; height: 126px; border-radius: 10px; background: #2c3e7a; border: 3px solid #c8a84b; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold; box-shadow: 3px 5px 12px rgba(0,0,0,0.5); position: relative; cursor: default; }
+  .card-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .joker-face { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #6c3483; color: #fff; font-size: 1rem; font-weight: 800; text-align: center; padding: 8px; }
+
+  .pile-stack { width: 90px; height: 126px; border-radius: 10px; background: #2c3e7a; border: 3px solid #c8a84b; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold; box-shadow: 3px 5px 12px rgba(0,0,0,0.5); position: relative; cursor: default; overflow: hidden; }
+  .pile-stack .card-back-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.95; }
+  .pile-stack .stack-overlay { position: relative; z-index: 1; text-align: center; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
   .pile-stack .pile-count { font-size: 1.4rem; }
-  .pile-stack .pile-label { font-size: 0.7rem; opacity: 0.8; margin-top: 2px; }
+  .pile-stack .pile-label { font-size: 0.7rem; opacity: 0.9; margin-top: 2px; }
   .pile-stack.empty { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.2); }
   .pile-name-label { font-size: 0.85rem; opacity: 0.85; text-align: center; }
   .select-btn { padding: 8px 18px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; cursor: pointer; border: none; background: #c8a84b; color: #1a1a1a; transition: background 0.2s; }
@@ -139,6 +144,56 @@ function cardDisplayName(card) {
   if (card === 'Joker1') return '🃏 Joker 1';
   if (card === 'Joker2') return '🃏 Joker 2';
   return card;
+}
+
+// Card images (served from deckofcardsapi.com)
+const CARD_IMG_BASE = 'https://deckofcardsapi.com/static/img/';
+const CARD_BACK_URL = CARD_IMG_BASE + 'back.png';
+const SUIT_TO_API = {'♠':'S','♥':'H','♦':'D','♣':'C'};
+
+function cardApiCode(card) {
+  if (card === 'Joker1' || card === 'Joker2') return null;
+  const suit = card.slice(-1);
+  const rank = card.slice(0, -1);
+  const suitCode = SUIT_TO_API[suit];
+  if (!suitCode) return null;
+  const rankCode = rank === '10' ? '0' : rank;
+  return `${rankCode}${suitCode}`;
+}
+
+function cardImageUrl(card) {
+  const code = cardApiCode(card);
+  if (!code) return null;
+  return CARD_IMG_BASE + code + '.png';
+}
+
+function renderDrawnSlot(el, card) {
+  if (!card) {
+    el.className = 'drawn-card empty-slot';
+    el.innerHTML = '';
+    return;
+  }
+
+  const imgUrl = cardImageUrl(card);
+  if (imgUrl) {
+    el.className = 'drawn-card';
+    el.innerHTML = `<img class="card-img" src="${imgUrl}" alt="${cardDisplayName(card)}" loading="lazy">`;
+  } else {
+    // Jokers (or any unknown) fall back to a styled face.
+    el.className = 'drawn-card';
+    el.innerHTML = `<div class="joker-face">${cardDisplayName(card)}</div>`;
+  }
+}
+
+function stackHTML(cardCount) {
+  if (cardCount <= 0) return `<div style="opacity:0.4;font-size:0.75rem;" class="stack-overlay">Empty</div>`;
+  return `
+    <img class="card-back-img" src="${CARD_BACK_URL}" alt="Card back" loading="lazy">
+    <div class="stack-overlay">
+      <div class="pile-count">${cardCount}</div>
+      <div class="pile-label">cards</div>
+    </div>
+  `;
 }
 
 // ---- SETUP ----
@@ -296,7 +351,8 @@ function renderCardGrid() {
       grid.appendChild(chip);
     }
   }
-  document.getElementById('avail-count').textContent = `(${52 - assigned.length} available)`;
+  const standardAssignedCount = assigned.filter(c => c !== 'Joker1' && c !== 'Joker2').length;
+  document.getElementById('avail-count').textContent = `(${52 - standardAssignedCount} available)`;
 }
 
 function renderPileCards() {
@@ -310,7 +366,7 @@ function renderPileCards() {
   for (let card of cards) {
     const chip = document.createElement('div');
     chip.className = 'card-chip ' + cardSuitClass(card);
-    chip.textContent = card;
+    chip.textContent = cardDisplayName(card);
     chip.title = 'Click to remove';
     chip.onclick = () => removeFromPile(card);
     list.appendChild(chip);
@@ -419,21 +475,14 @@ function renderPlayScreen() {
 
     // Drawn card slot
     const drawnSlot = document.createElement('div');
-    if (pile.currentDrawn) {
-      drawnSlot.className = 'drawn-card ' + cardSuitClass(pile.currentDrawn);
-      drawnSlot.textContent = pile.currentDrawn;
-    } else {
-      drawnSlot.className = 'drawn-card empty-slot';
-    }
     drawnSlot.id = `drawn-${i}`;
+    renderDrawnSlot(drawnSlot, pile.currentDrawn);
 
     // Pile stack
     const stack = document.createElement('div');
     stack.className = 'pile-stack' + (pile.cards.length === 0 ? ' empty' : '');
     stack.id = `stack-${i}`;
-    stack.innerHTML = pile.cards.length > 0
-      ? `<div><div class="pile-count">${pile.cards.length}</div><div class="pile-label">cards</div></div>`
-      : `<div style="opacity:0.4;font-size:0.75rem;">Empty</div>`;
+    stack.innerHTML = stackHTML(pile.cards.length);
 
     // Pile name
     const nameLabel = document.createElement('div');
@@ -469,17 +518,12 @@ function drawCard(pileIndex) {
 
   // Update drawn card display
   const drawnEl = document.getElementById(`drawn-${pileIndex}`);
-  drawnEl.className = 'drawn-card ' + cardSuitClass(pile.currentDrawn);
-  drawnEl.textContent = pile.currentDrawn;
+  renderDrawnSlot(drawnEl, pile.currentDrawn);
 
   // Update stack
   const stackEl = document.getElementById(`stack-${pileIndex}`);
-  if (pile.cards.length === 0) {
-    stackEl.className = 'pile-stack empty';
-    stackEl.innerHTML = `<div style="opacity:0.4;font-size:0.75rem;">Empty</div>`;
-  } else {
-    stackEl.innerHTML = `<div><div class="pile-count">${pile.cards.length}</div><div class="pile-label">cards</div></div>`;
-  }
+  stackEl.className = 'pile-stack' + (pile.cards.length === 0 ? ' empty' : '');
+  stackEl.innerHTML = stackHTML(pile.cards.length);
 
   // Update button
   const btn = document.getElementById(`btn-${pileIndex}`);
