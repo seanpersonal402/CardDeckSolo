@@ -30,6 +30,7 @@
   .card-chip { padding: 4px 8px; border-radius: 5px; font-size: 0.82rem; font-weight: bold; cursor: pointer; border: 2px solid transparent; user-select: none; transition: opacity 0.15s; }
   .card-chip.hearts, .card-chip.diamonds { background: #fff; color: #c0392b; }
   .card-chip.spades, .card-chip.clubs { background: #fff; color: #1a1a1a; }
+  .card-chip.joker { background: #6c3483; color: #fff; }
   .card-chip.assigned { opacity: 0.3; cursor: not-allowed; }
   .card-chip.selected { border-color: #f1c40f; box-shadow: 0 0 6px #f1c40f; }
   .pile-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; justify-content: center; }
@@ -108,6 +109,10 @@
 const SUITS = ['♠','♥','♦','♣'];
 const SUIT_NAMES = {'♠':'spades','♥':'hearts','♦':'diamonds','♣':'clubs'};
 const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const FACE_RANKS = ['J','Q','K'];
+// Jokers: each can be assigned to ONE pile (tracked separately)
+// jokerAssigned[0] = pileIndex or -1, jokerAssigned[1] = pileIndex or -1
+let jokerAssigned = [-1, -1];
 
 let numPiles = 2;
 let pileNames = [];
@@ -122,8 +127,15 @@ function buildDeck() {
 }
 
 function cardSuitClass(card) {
+  if (card === 'Joker1' || card === 'Joker2') return 'joker';
   const s = card.slice(-1);
   return SUIT_NAMES[s] || '';
+}
+
+function cardDisplayName(card) {
+  if (card === 'Joker1') return '🃏 Joker 1';
+  if (card === 'Joker2') return '🃏 Joker 2';
+  return card;
 }
 
 // ---- SETUP ----
@@ -135,6 +147,7 @@ function goToAssign() {
   numPiles = Math.min(6, Math.max(1, parseInt(document.getElementById('pile-count').value) || 2));
   pileNames = Array.from({length: numPiles}, (_, i) => `Pile ${i+1}`);
   pileAssignments = Array.from({length: numPiles}, () => []);
+  jokerAssigned = [-1, -1];
   activePileIndex = 0;
   buildAssignScreen();
   showScreen('assign-screen');
@@ -164,12 +177,46 @@ function buildPileTabs() {
 function buildSuitQuickBtns() {
   const container = document.getElementById('suit-quick-btns');
   container.innerHTML = '';
+
+  // Suit buttons
   for (let s of SUITS) {
     const b = document.createElement('button');
     b.className = 'suit-btn';
-    b.textContent = 'Add all ' + s;
+    b.textContent = 'All ' + s;
     b.onclick = () => addSuitToPile(s);
     container.appendChild(b);
+  }
+
+  // Face cards button
+  const faceBtn = document.createElement('button');
+  faceBtn.className = 'suit-btn';
+  faceBtn.style.borderColor = '#f1c40f';
+  faceBtn.style.color = '#f1c40f';
+  faceBtn.textContent = '👑 All Face Cards';
+  faceBtn.onclick = () => addFaceCardsToPile();
+  container.appendChild(faceBtn);
+
+  // Joker buttons
+  for (let j = 0; j < 2; j++) {
+    const jBtn = document.createElement('button');
+    jBtn.className = 'suit-btn';
+    jBtn.id = `joker-btn-${j}`;
+    jBtn.style.borderColor = '#a569bd';
+    jBtn.style.color = '#a569bd';
+    const assignedTo = jokerAssigned[j];
+    if (assignedTo === activePileIndex) {
+      jBtn.textContent = `🃏 Remove Joker ${j+1}`;
+      jBtn.style.background = 'rgba(165,105,189,0.3)';
+      jBtn.onclick = () => removeJokerFromPile(j);
+    } else if (assignedTo !== -1) {
+      jBtn.textContent = `🃏 Joker ${j+1} (in ${pileNames[assignedTo]})`;
+      jBtn.style.opacity = '0.4';
+      jBtn.style.cursor = 'not-allowed';
+    } else {
+      jBtn.textContent = `🃏 Add Joker ${j+1}`;
+      jBtn.onclick = () => addJokerToPile(j);
+    }
+    container.appendChild(jBtn);
   }
 }
 
