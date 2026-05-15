@@ -11,65 +11,92 @@
   .screen { display: none; }
   .screen.active { display: block; }
 
-  /* SETUP SCREEN */
+  /* SETUP */
   #setup-screen { max-width: 400px; margin: 60px auto; background: rgba(0,0,0,0.4); border-radius: 12px; padding: 30px; text-align: center; }
   #setup-screen label { display: block; margin-bottom: 10px; font-size: 1.1rem; }
-  #setup-screen input[type=number] { width: 80px; padding: 8px; font-size: 1.2rem; border-radius: 6px; border: none; text-align: center; }
-  .btn { background: #c8a84b; color: #1a1a1a; border: none; padding: 10px 24px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 16px; transition: background 0.2s; }
-  .btn:hover { background: #e0c060; }
-  .btn.danger { background: #c0392b; color: #fff; }
-  .btn.danger:hover { background: #e74c3c; }
+  #pile-count { font-size: 1.4rem; width: 80px; text-align: center; padding: 8px; border-radius: 8px; border: none; }
+  .btn { background: #e8c84a; color: #1a3a1a; border: none; padding: 10px 24px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 16px; }
+  .btn:hover { background: #f0d860; }
+  .btn-danger { background: #c0392b; color: #fff; }
+  .btn-danger:hover { background: #e74c3c; }
+  .btn-blue { background: #2980b9; color: #fff; }
+  .btn-blue:hover { background: #3498db; }
+  .btn-purple { background: #8e44ad; color: #fff; }
+  .btn-purple:hover { background: #9b59b6; }
 
-  /* ASSIGN SCREEN */
+  /* ASSIGN */
   #assign-screen { max-width: 900px; margin: 0 auto; }
-  #assign-screen h2 { text-align: center; margin-bottom: 16px; }
-  .assign-layout { display: flex; gap: 16px; flex-wrap: wrap; }
-  .card-pool { background: rgba(0,0,0,0.35); border-radius: 10px; padding: 14px; flex: 1; min-width: 260px; }
-  .card-pool h3 { margin-bottom: 10px; font-size: 1rem; }
-  .card-grid { display: flex; flex-wrap: wrap; gap: 5px; }
-  .card-chip { padding: 4px 8px; border-radius: 5px; font-size: 0.82rem; font-weight: bold; cursor: pointer; border: 2px solid transparent; user-select: none; transition: opacity 0.15s; }
-  .card-chip.hearts, .card-chip.diamonds { background: #fff; color: #c0392b; }
-  .card-chip.spades, .card-chip.clubs { background: #fff; color: #1a1a1a; }
-  .card-chip.joker { background: #6c3483; color: #fff; }
-  .card-chip.assigned { opacity: 0.3; cursor: not-allowed; }
-  .card-chip.selected { border-color: #f1c40f; box-shadow: 0 0 6px #f1c40f; }
-  .pile-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; justify-content: center; }
-  .pile-tab { padding: 6px 14px; border-radius: 20px; background: rgba(255,255,255,0.15); cursor: pointer; font-size: 0.9rem; border: 2px solid transparent; display: flex; align-items: center; gap: 5px; }
-  .pile-tab.active { background: #c8a84b; color: #1a1a1a; border-color: #e0c060; }
-  .rename-icon { font-size: 0.75rem; opacity: 0.7; cursor: pointer; }
-  .rename-icon:hover { opacity: 1; }
-  .rename-input { border: none; border-bottom: 2px solid #1a1a1a; background: transparent; font-size: 0.9rem; font-weight: bold; color: #1a1a1a; width: 90px; outline: none; padding: 0 2px; }
-  .pile-assigned { background: rgba(0,0,0,0.35); border-radius: 10px; padding: 14px; flex: 1; min-width: 260px; }
-  .pile-assigned h3 { margin-bottom: 10px; }
-  .suit-btns { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
-  .suit-btn { padding: 5px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; border: 2px solid #fff; background: transparent; color: #fff; }
-  .suit-btn:hover { background: rgba(255,255,255,0.2); }
-  #assign-actions { text-align: center; margin-top: 20px; }
+  .pile-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .pile-tab { background: rgba(0,0,0,0.3); border: 2px solid transparent; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; }
+  .pile-tab.active { border-color: #e8c84a; background: rgba(232,200,74,0.2); }
+  .pile-tab .rename-icon { font-size: 0.75rem; opacity: 0.6; cursor: pointer; }
+  .pile-tab .rename-icon:hover { opacity: 1; }
+  .pile-tab input.rename-input { background: transparent; border: none; border-bottom: 1px solid #e8c84a; color: #fff; font-size: 0.95rem; width: 80px; outline: none; }
+  .assign-layout { display: flex; gap: 16px; }
+  .card-grid-wrap { flex: 1; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; }
+  .suit-quick-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .suit-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; }
+  .suit-btn:hover { background: rgba(255,255,255,0.3); }
+  .suit-btn.face-btn { background: rgba(232,200,74,0.3); }
+  .suit-btn.joker-btn { background: rgba(142,68,173,0.4); }
+  .suit-btn.joker-remove { background: rgba(192,57,43,0.4); }
+  .card-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .card-chip { background: #fff; color: #222; border-radius: 6px; padding: 4px 8px; font-size: 0.82rem; cursor: pointer; border: 2px solid transparent; user-select: none; }
+  .card-chip:hover { border-color: #e8c84a; }
+  .card-chip.selected { background: #e8c84a; color: #1a3a1a; border-color: #c8a820; }
+  .card-chip.hearts, .card-chip.diamonds { color: #c0392b; }
+  .card-chip.spades, .card-chip.clubs { color: #1a1a1a; }
+  .card-chip.joker { background: #8e44ad; color: #fff; }
+  .card-chip.joker.selected { background: #6c3483; border-color: #9b59b6; }
+  .pile-cards-wrap { width: 200px; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; }
+  .pile-cards-wrap h3 { margin-bottom: 8px; font-size: 0.95rem; }
+  .pile-card-list { display: flex; flex-wrap: wrap; gap: 4px; min-height: 40px; }
+  .assign-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .avail-count { font-size: 0.85rem; opacity: 0.7; margin-bottom: 8px; }
 
-  /* PLAY SCREEN */
+  /* PLAY */
   #play-screen { max-width: 1000px; margin: 0 auto; }
-  #play-screen h2 { text-align: center; margin-bottom: 20px; }
-  .piles-container { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-  .pile-area { display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 120px; }
-  .drawn-card { width: 90px; height: 126px; border-radius: 10px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: bold; box-shadow: 2px 4px 10px rgba(0,0,0,0.5); min-height: 126px; overflow: hidden; }
-  .drawn-card.hearts, .drawn-card.diamonds { color: #c0392b; }
-  .drawn-card.spades, .drawn-card.clubs { color: #1a1a1a; }
-  .drawn-card.empty-slot { background: transparent; box-shadow: none; border: 2px dashed rgba(255,255,255,0.2); }
-  .card-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .joker-face { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #6c3483; color: #fff; font-size: 1rem; font-weight: 800; text-align: center; padding: 8px; }
+  .play-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+  .piles-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+  .pile-card-box { background: rgba(0,0,0,0.35); border-radius: 12px; padding: 16px; text-align: center; min-width: 160px; }
+  .pile-card-box h3 { margin-bottom: 10px; font-size: 1rem; }
+  .pile-stack { width: 90px; height: 120px; background: #2c3e50; border-radius: 8px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #4a6fa5; position: relative; }
+  .pile-stack.empty { background: #1a252f; border-color: #2c3e50; cursor: default; }
+  .pile-count { font-size: 1.6rem; font-weight: bold; }
+  .pile-label { font-size: 0.75rem; opacity: 0.7; }
+  .drawn-card { width: 90px; height: 120px; margin: 0 auto 10px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
+  .drawn-card.empty-slot { background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,255,255,0.2); }
+  .select-btn { background: #27ae60; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; font-weight: bold; width: 100%; }
+  .select-btn:hover { background: #2ecc71; }
+  .select-btn.shuffle { background: #e67e22; }
+  .select-btn.shuffle:hover { background: #f39c12; }
+  .card-img { width: 88px; height: 118px; border-radius: 6px; object-fit: cover; }
+  .card-back-img { width: 88px; height: 118px; border-radius: 6px; }
+  .joker-face { width: 88px; height: 118px; border-radius: 6px; background: linear-gradient(135deg,#8e44ad,#3498db); display:flex; align-items:center; justify-content:center; font-size:2.5rem; }
+  .stack-overlay { position:relative; display:inline-block; }
+  .stack-overlay::after { content:''; position:absolute; top:4px; left:4px; right:-4px; bottom:-4px; background:rgba(0,0,0,0.3); border-radius:6px; z-index:-1; }
 
-  .pile-stack { width: 90px; height: 126px; border-radius: 10px; background: #2c3e7a; border: 3px solid #c8a84b; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold; box-shadow: 3px 5px 12px rgba(0,0,0,0.5); position: relative; cursor: default; overflow: hidden; }
-  .pile-stack .card-back-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.95; }
-  .pile-stack .stack-overlay { position: relative; z-index: 1; text-align: center; text-shadow: 1px 1px 3px rgba(0,0,0,0.9); }
-  .pile-stack .pile-count { font-size: 1.4rem; }
-  .pile-stack .pile-label { font-size: 0.7rem; opacity: 0.9; margin-top: 2px; }
-  .pile-stack.empty { background: rgba(0,0,0,0.2); border-color: rgba(255,255,255,0.2); }
-  .pile-name-label { font-size: 0.85rem; opacity: 0.85; text-align: center; }
-  .select-btn { padding: 8px 18px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; cursor: pointer; border: none; background: #c8a84b; color: #1a1a1a; transition: background 0.2s; }
-  .select-btn:hover { background: #e0c060; }
-  .select-btn.shuffle { background: #2980b9; color: #fff; }
-  .select-btn.shuffle:hover { background: #3498db; }
-  #play-actions { text-align: center; margin-top: 30px; }
+  /* DRAW SET MODAL */
+  .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:100; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal-box { background:#1e5c38; border-radius:14px; padding:28px; max-width:480px; width:90%; text-align:center; }
+  .modal-box h2 { margin-bottom:16px; }
+  .modal-box p { margin-bottom:12px; font-size:0.95rem; opacity:0.85; }
+  .draw-count-input { font-size:1.3rem; width:80px; text-align:center; padding:8px; border-radius:8px; border:none; margin-bottom:16px; }
+  .modal-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+  /* REVEAL SCREEN */
+  #reveal-screen { max-width:600px; margin:0 auto; text-align:center; }
+  .reveal-info { margin-bottom:20px; font-size:1rem; opacity:0.85; }
+  .reveal-card-area { display:flex; flex-direction:column; align-items:center; gap:16px; margin-bottom:24px; }
+  .reveal-card-slot { width:120px; height:160px; border-radius:10px; display:flex; align-items:center; justify-content:center; }
+  .reveal-card-slot.empty-slot { background:rgba(255,255,255,0.05); border:2px dashed rgba(255,255,255,0.2); }
+  .reveal-card-img { width:118px; height:158px; border-radius:8px; object-fit:cover; }
+  .reveal-joker { width:118px; height:158px; border-radius:8px; background:linear-gradient(135deg,#8e44ad,#3498db); display:flex; align-items:center; justify-content:center; font-size:3rem; }
+  .reveal-progress { font-size:0.9rem; opacity:0.7; margin-bottom:8px; }
+  .drawn-set-list { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:20px; }
+  .drawn-set-chip { background:rgba(255,255,255,0.15); border-radius:6px; padding:3px 8px; font-size:0.8rem; }
+  .drawn-set-chip.revealed { background:rgba(232,200,74,0.4); }
 </style>
 </head>
 <body>
@@ -85,80 +112,93 @@
 
 <!-- ASSIGN SCREEN -->
 <div id="assign-screen" class="screen">
-  <h2>Assign Cards to Piles</h2>
   <div class="pile-tabs" id="pile-tabs"></div>
   <div class="assign-layout">
-    <div class="card-pool">
-      <h3>Available Cards <span id="avail-count"></span></h3>
-      <div class="suit-btns" id="suit-quick-btns"></div>
+    <div class="card-grid-wrap">
+      <div class="suit-quick-btns" id="suit-quick-btns"></div>
+      <div class="avail-count" id="avail-count"></div>
       <div class="card-grid" id="card-grid"></div>
     </div>
-    <div class="pile-assigned">
-      <h3>Cards in <span id="current-pile-name"></span></h3>
-      <div class="card-grid" id="pile-card-list"></div>
+    <div class="pile-cards-wrap">
+      <h3>Cards in pile:</h3>
+      <div class="pile-card-list" id="pile-card-list"></div>
     </div>
   </div>
-  <div id="assign-actions">
+  <div class="assign-actions">
+    <button class="btn btn-danger" onclick="resetAssign()">↺ Reset All</button>
     <button class="btn" onclick="goToPlay()">▶ Start Game</button>
-    <button class="btn danger" onclick="resetAssign()" style="margin-left:10px;">↺ Reset All</button>
   </div>
 </div>
 
 <!-- PLAY SCREEN -->
 <div id="play-screen" class="screen">
-  <h2>Draw Cards</h2>
-  <div class="piles-container" id="piles-container"></div>
-  <div id="play-actions">
-    <button class="btn danger" onclick="goToSetup()">↺ Start Over</button>
+  <div class="play-header">
+    <button class="btn btn-danger" onclick="goToAssign()">← Back to Assign</button>
+    <span style="font-size:1rem;opacity:0.8;">Click a pile to draw a card</span>
   </div>
+  <div class="piles-grid" id="piles-grid"></div>
+</div>
+
+<!-- DRAW SET MODAL -->
+<div class="modal-overlay" id="draw-set-modal">
+  <div class="modal-box">
+    <h2>🎲 Draw a Set</h2>
+    <p id="draw-set-pile-name">From: Pile 1</p>
+    <p>How many cards to draw randomly?</p>
+    <input type="number" class="draw-count-input" id="draw-count-input" min="1" value="5">
+    <p id="draw-count-max" style="font-size:0.8rem;opacity:0.6;"></p>
+    <div class="modal-actions">
+      <button class="btn btn-danger" onclick="closeDrawSetModal()">Cancel</button>
+      <button class="btn btn-purple" onclick="confirmDrawSet()">🔀 Draw & Shuffle</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVEAL SCREEN -->
+<div id="reveal-screen" class="screen">
+  <div class="play-header">
+    <button class="btn btn-blue" onclick="backToPlay()">← Back to Piles</button>
+    <span id="reveal-pile-title" style="font-size:1.1rem;font-weight:bold;"></span>
+  </div>
+  <div class="reveal-info" id="reveal-info"></div>
+  <div class="reveal-card-area">
+    <div class="reveal-card-slot empty-slot" id="reveal-slot"></div>
+  </div>
+  <div class="reveal-progress" id="reveal-progress"></div>
+  <div class="drawn-set-list" id="drawn-set-list"></div>
+  <button class="btn btn-purple" id="reveal-btn" onclick="revealNext()">🃏 Reveal Next Card</button>
 </div>
 
 <script>
 const SUITS = ['♠','♥','♦','♣'];
-const SUIT_NAMES = {'♠':'spades','♥':'hearts','♦':'diamonds','♣':'clubs'};
+const SUIT_NAMES = ['spades','hearts','diamonds','clubs'];
 const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 const FACE_RANKS = ['J','Q','K'];
-// Jokers: each can be assigned to ONE pile (tracked separately)
-// jokerAssigned[0] = pileIndex or -1, jokerAssigned[1] = pileIndex or -1
-let jokerAssigned = [-1, -1];
+const CARD_IMG_BASE = 'https://deckofcardsapi.com/static/img/';
+const CARD_BACK_URL = 'https://deckofcardsapi.com/static/img/back.png';
+const SUIT_TO_API = {'♠':'S','♥':'H','♦':'D','♣':'C'};
 
 let numPiles = 2;
 let pileNames = [];
-let pileAssignments = []; // array of arrays of card strings
+let pileAssignments = [];
 let activePileIndex = 0;
-let gameState = []; // [{name, cards:[], drawn:[], currentDrawn:null}]
+let jokerAssigned = [-1,-1];
 
-function buildDeck() {
-  let deck = [];
-  for (let s of SUITS) for (let r of RANKS) deck.push(r + s);
-  return deck;
-}
+// Play state
+let piles = [];
 
-function cardSuitClass(card) {
-  if (card === 'Joker1' || card === 'Joker2') return 'joker';
-  const s = card.slice(-1);
-  return SUIT_NAMES[s] || '';
-}
-
-function cardDisplayName(card) {
-  if (card === 'Joker1') return '🃏 Joker 1';
-  if (card === 'Joker2') return '🃏 Joker 2';
-  return card;
-}
-
-// Card images (served from deckofcardsapi.com)
-const CARD_IMG_BASE = 'https://deckofcardsapi.com/static/img/';
-const CARD_BACK_URL = CARD_IMG_BASE + 'back.png';
-const SUIT_TO_API = {'♠':'S','♥':'H','♦':'D','♣':'C'};
+// Reveal state
+let revealPileIndex = -1;
+let revealDeck = [];
+let revealIndex = 0;
+let revealOriginal = [];
 
 function cardApiCode(card) {
   if (card === 'Joker1' || card === 'Joker2') return null;
-  const suit = card.slice(-1);
-  const rank = card.slice(0, -1);
-  const suitCode = SUIT_TO_API[suit];
-  if (!suitCode) return null;
-  const rankCode = rank === '10' ? '0' : rank;
-  return `${rankCode}${suitCode}`;
+  const [suit, ...rankParts] = card.split('-');
+  const rank = rankParts.join('-');
+  const r = rank === '10' ? '0' : rank;
+  return r + SUIT_TO_API[suit];
 }
 
 function cardImageUrl(card) {
@@ -167,51 +207,39 @@ function cardImageUrl(card) {
   return CARD_IMG_BASE + code + '.png';
 }
 
-function renderDrawnSlot(el, card) {
-  if (!card) {
-    el.className = 'drawn-card empty-slot';
-    el.innerHTML = '';
-    return;
-  }
-
-  const imgUrl = cardImageUrl(card);
-  if (imgUrl) {
-    el.className = 'drawn-card';
-    el.innerHTML = `<img class="card-img" src="${imgUrl}" alt="${cardDisplayName(card)}" loading="lazy">`;
-  } else {
-    // Jokers (or any unknown) fall back to a styled face.
-    el.className = 'drawn-card';
-    el.innerHTML = `<div class="joker-face">${cardDisplayName(card)}</div>`;
-  }
+function cardDisplayName(card) {
+  if (card === 'Joker1') return '🃏 Joker 1';
+  if (card === 'Joker2') return '🃏 Joker 2';
+  const [suit, ...rankParts] = card.split('-');
+  return rankParts.join('-') + suit;
 }
 
-function stackHTML(cardCount) {
-  if (cardCount <= 0) return `<div style="opacity:0.4;font-size:0.75rem;" class="stack-overlay">Empty</div>`;
-  return `
-    <img class="card-back-img" src="${CARD_BACK_URL}" alt="Card back" loading="lazy">
-    <div class="stack-overlay">
-      <div class="pile-count">${cardCount}</div>
-      <div class="pile-label">cards</div>
-    </div>
-  `;
+function cardSuitClass(card) {
+  if (card === 'Joker1' || card === 'Joker2') return 'joker';
+  const suit = card.split('-')[0];
+  return SUIT_NAMES[SUITS.indexOf(suit)];
 }
 
-// ---- SETUP ----
-function goToSetup() {
-  showScreen('setup-screen');
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 function goToAssign() {
-  numPiles = Math.min(6, Math.max(1, parseInt(document.getElementById('pile-count').value) || 2));
+  numPiles = parseInt(document.getElementById('pile-count').value) || 2;
+  numPiles = Math.max(1, Math.min(6, numPiles));
   pileNames = Array.from({length: numPiles}, (_, i) => `Pile ${i+1}`);
   pileAssignments = Array.from({length: numPiles}, () => []);
-  jokerAssigned = [-1, -1];
+  jokerAssigned = [-1,-1];
   activePileIndex = 0;
   buildAssignScreen();
   showScreen('assign-screen');
 }
 
-// ---- ASSIGN ----
 function buildAssignScreen() {
   buildPileTabs();
   buildSuitQuickBtns();
@@ -223,51 +251,30 @@ function buildPileTabs() {
   const tabs = document.getElementById('pile-tabs');
   tabs.innerHTML = '';
   for (let i = 0; i < numPiles; i++) {
-    const isActive = i === activePileIndex;
-    const t = document.createElement('div');
-    t.className = 'pile-tab' + (isActive ? ' active' : '');
-
-    const nameSpan = document.createElement('span');
-    nameSpan.textContent = pileNames[i];
-    nameSpan.onclick = () => { activePileIndex = i; buildPileTabs(); renderCardGrid(); renderPileCards(); };
-    t.appendChild(nameSpan);
-
-    if (isActive) {
-      const editIcon = document.createElement('span');
-      editIcon.className = 'rename-icon';
-      editIcon.textContent = '✏️';
-      editIcon.title = 'Rename pile';
-      editIcon.onclick = (e) => {
-        e.stopPropagation();
-        startRenamePile(i, t, nameSpan);
-      };
-      t.appendChild(editIcon);
-    }
-
-    tabs.appendChild(t);
+    const tab = document.createElement('div');
+    tab.className = 'pile-tab' + (i === activePileIndex ? ' active' : '');
+    tab.innerHTML = `<span class="tab-label" ondblclick="startRenamePile(${i})">${pileNames[i]}</span><span class="rename-icon" onclick="startRenamePile(${i})">✏️</span>`;
+    tab.onclick = (e) => { if (!e.target.classList.contains('rename-icon') && e.target.tagName !== 'INPUT') { activePileIndex = i; buildAssignScreen(); } };
+    tabs.appendChild(tab);
   }
-  document.getElementById('current-pile-name').textContent = pileNames[activePileIndex];
 }
 
-function startRenamePile(index, tabEl, nameSpan) {
-  // Replace name span with input
+function startRenamePile(index) {
+  const tabs = document.getElementById('pile-tabs');
+  const tab = tabs.children[index];
+  const labelEl = tab.querySelector('.tab-label');
   const input = document.createElement('input');
-  input.type = 'text';
   input.className = 'rename-input';
   input.value = pileNames[index];
-  input.maxLength = 20;
-  tabEl.replaceChild(input, nameSpan);
+  tab.replaceChild(input, labelEl);
   input.focus();
   input.select();
-
-  function commitRename() {
-    const newName = input.value.trim();
-    if (newName) pileNames[index] = newName;
+  const commitRename = () => {
+    const newName = input.value.trim() || pileNames[index];
+    pileNames[index] = newName;
     buildPileTabs();
-    renderPileCards();
-    buildSuitQuickBtns(); // refresh joker labels that reference pile names
-  }
-
+    buildSuitQuickBtns();
+  };
   input.onblur = commitRename;
   input.onkeydown = (e) => {
     if (e.key === 'Enter') input.blur();
@@ -278,42 +285,31 @@ function startRenamePile(index, tabEl, nameSpan) {
 function buildSuitQuickBtns() {
   const container = document.getElementById('suit-quick-btns');
   container.innerHTML = '';
-
-  // Suit buttons
-  for (let s of SUITS) {
-    const b = document.createElement('button');
-    b.className = 'suit-btn';
-    b.textContent = 'All ' + s;
-    b.onclick = () => addSuitToPile(s);
-    container.appendChild(b);
-  }
-
-  // Face cards button
+  SUITS.forEach((suit, si) => {
+    const btn = document.createElement('button');
+    btn.className = 'suit-btn';
+    btn.textContent = `All ${suit}`;
+    btn.onclick = () => addSuitToPile(suit);
+    container.appendChild(btn);
+  });
   const faceBtn = document.createElement('button');
-  faceBtn.className = 'suit-btn';
-  faceBtn.style.borderColor = '#f1c40f';
-  faceBtn.style.color = '#f1c40f';
+  faceBtn.className = 'suit-btn face-btn';
   faceBtn.textContent = '👑 All Face Cards';
-  faceBtn.onclick = () => addFaceCardsToPile();
+  faceBtn.onclick = addFaceCardsToPile;
   container.appendChild(faceBtn);
-
-  // Joker buttons
   for (let j = 0; j < 2; j++) {
     const jBtn = document.createElement('button');
-    jBtn.className = 'suit-btn';
-    jBtn.id = `joker-btn-${j}`;
-    jBtn.style.borderColor = '#a569bd';
-    jBtn.style.color = '#a569bd';
-    const assignedTo = jokerAssigned[j];
-    if (assignedTo === activePileIndex) {
-      jBtn.textContent = `🃏 Remove Joker ${j+1}`;
-      jBtn.style.background = 'rgba(165,105,189,0.3)';
+    if (jokerAssigned[j] === activePileIndex) {
+      jBtn.className = 'suit-btn joker-remove';
+      jBtn.textContent = `Remove Joker ${j+1}`;
       jBtn.onclick = () => removeJokerFromPile(j);
-    } else if (assignedTo !== -1) {
-      jBtn.textContent = `🃏 Joker ${j+1} (in ${pileNames[assignedTo]})`;
-      jBtn.style.opacity = '0.4';
-      jBtn.style.cursor = 'not-allowed';
+    } else if (jokerAssigned[j] !== -1) {
+      jBtn.className = 'suit-btn joker-btn';
+      jBtn.textContent = `🃏 Joker ${j+1} (in ${pileNames[jokerAssigned[j]]})`;
+      jBtn.disabled = true;
+      jBtn.style.opacity = '0.5';
     } else {
+      jBtn.className = 'suit-btn joker-btn';
       jBtn.textContent = `🃏 Add Joker ${j+1}`;
       jBtn.onclick = () => addJokerToPile(j);
     }
@@ -321,102 +317,36 @@ function buildSuitQuickBtns() {
   }
 }
 
-function getAllAssigned() {
-  return pileAssignments.flat();
-}
-
-function renderCardGrid() {
-  const grid = document.getElementById('card-grid');
-  const assigned = getAllAssigned();
-  const currentPile = pileAssignments[activePileIndex];
-  grid.innerHTML = '';
-  for (let s of SUITS) {
-    for (let r of RANKS) {
-      const card = r + s;
-      const chip = document.createElement('div');
-      chip.className = 'card-chip ' + SUIT_NAMES[s];
-      chip.textContent = card;
-      const isAssigned = assigned.includes(card);
-      const isInCurrentPile = currentPile.includes(card);
-      if (isAssigned && !isInCurrentPile) {
-        chip.classList.add('assigned');
-        chip.title = 'Already in another pile';
-      } else if (isInCurrentPile) {
-        chip.classList.add('selected');
-        chip.onclick = () => removeFromPile(card);
-        chip.title = 'Click to remove';
-      } else {
-        chip.onclick = () => addToPile(card);
-      }
-      grid.appendChild(chip);
-    }
-  }
-  const standardAssignedCount = assigned.filter(c => c !== 'Joker1' && c !== 'Joker2').length;
-  document.getElementById('avail-count').textContent = `(${52 - standardAssignedCount} available)`;
-}
-
-function renderPileCards() {
-  const list = document.getElementById('pile-card-list');
-  list.innerHTML = '';
-  const cards = pileAssignments[activePileIndex];
-  if (cards.length === 0) {
-    list.innerHTML = '<em style="opacity:0.5;font-size:0.85rem;">No cards assigned yet</em>';
-    return;
-  }
-  for (let card of cards) {
-    const chip = document.createElement('div');
-    chip.className = 'card-chip ' + cardSuitClass(card);
-    chip.textContent = cardDisplayName(card);
-    chip.title = 'Click to remove';
-    chip.onclick = () => removeFromPile(card);
-    list.appendChild(chip);
-  }
-}
-
-function addToPile(card) {
-  if (!getAllAssigned().includes(card)) {
-    pileAssignments[activePileIndex].push(card);
-    renderCardGrid();
-    renderPileCards();
-  }
-}
-
-function removeFromPile(card) {
-  pileAssignments[activePileIndex] = pileAssignments[activePileIndex].filter(c => c !== card);
-  renderCardGrid();
-  renderPileCards();
-}
-
 function addSuitToPile(suit) {
-  const assigned = getAllAssigned();
-  for (let r of RANKS) {
-    const card = r + suit;
-    if (!assigned.includes(card)) {
+  RANKS.forEach(rank => {
+    const card = `${suit}-${rank}`;
+    const alreadyInOther = pileAssignments.some((pa, i) => i !== activePileIndex && pa.includes(card));
+    if (!alreadyInOther && !pileAssignments[activePileIndex].includes(card)) {
       pileAssignments[activePileIndex].push(card);
     }
-  }
+  });
   renderCardGrid();
   renderPileCards();
 }
 
 function addFaceCardsToPile() {
-  const assigned = getAllAssigned();
-  for (let s of SUITS) {
-    for (let r of FACE_RANKS) {
-      const card = r + s;
-      if (!assigned.includes(card)) {
+  SUITS.forEach(suit => {
+    FACE_RANKS.forEach(rank => {
+      const card = `${suit}-${rank}`;
+      const alreadyInOther = pileAssignments.some((pa, i) => i !== activePileIndex && pa.includes(card));
+      if (!alreadyInOther && !pileAssignments[activePileIndex].includes(card)) {
         pileAssignments[activePileIndex].push(card);
       }
-    }
-  }
+    });
+  });
   renderCardGrid();
   renderPileCards();
 }
 
 function addJokerToPile(j) {
-  if (jokerAssigned[j] !== -1) return; // already assigned elsewhere
+  const jokerCard = j === 0 ? 'Joker1' : 'Joker2';
   jokerAssigned[j] = activePileIndex;
-  pileAssignments[activePileIndex].push(j === 0 ? 'Joker1' : 'Joker2');
+  pileAssignments[activePileIndex].push(jokerCard);
   buildSuitQuickBtns();
   renderCardGrid();
   renderPileCards();
@@ -433,128 +363,242 @@ function removeJokerFromPile(j) {
 
 function resetAssign() {
   pileAssignments = Array.from({length: numPiles}, () => []);
-  jokerAssigned = [-1, -1];
+  jokerAssigned = [-1,-1];
   activePileIndex = 0;
   buildAssignScreen();
 }
 
-// ---- PLAY ----
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+function renderCardGrid() {
+  const grid = document.getElementById('card-grid');
+  const countEl = document.getElementById('avail-count');
+  grid.innerHTML = '';
+  const assignedElsewhere = new Set();
+  pileAssignments.forEach((pa, i) => {
+    if (i !== activePileIndex) pa.forEach(c => assignedElsewhere.add(c));
+  });
+  let available = 0;
+  SUITS.forEach((suit, si) => {
+    RANKS.forEach(rank => {
+      const card = `${suit}-${rank}`;
+      if (assignedElsewhere.has(card)) return;
+      available++;
+      const chip = document.createElement('div');
+      chip.className = `card-chip ${SUIT_NAMES[si]}` + (pileAssignments[activePileIndex].includes(card) ? ' selected' : '');
+      chip.textContent = rank + suit;
+      chip.onclick = () => toggleCard(card);
+      grid.appendChild(chip);
+    });
+  });
+  countEl.textContent = `${available} cards available`;
+}
+
+function renderPileCards() {
+  const list = document.getElementById('pile-card-list');
+  list.innerHTML = '';
+  pileAssignments[activePileIndex].forEach(card => {
+    const chip = document.createElement('div');
+    chip.className = `card-chip ${cardSuitClass(card)} selected`;
+    chip.textContent = card.startsWith('Joker') ? (card === 'Joker1' ? '🃏1' : '🃏2') : cardDisplayName(card);
+    chip.onclick = () => toggleCard(card);
+    list.appendChild(chip);
+  });
+}
+
+function toggleCard(card) {
+  const idx = pileAssignments[activePileIndex].indexOf(card);
+  if (idx === -1) {
+    pileAssignments[activePileIndex].push(card);
+  } else {
+    pileAssignments[activePileIndex].splice(idx, 1);
+    if (card === 'Joker1') jokerAssigned[0] = -1;
+    if (card === 'Joker2') jokerAssigned[1] = -1;
   }
-  return arr;
+  buildSuitQuickBtns();
+  renderCardGrid();
+  renderPileCards();
 }
 
 function goToPlay() {
-  const hasCards = pileAssignments.some(p => p.length > 0);
-  if (!hasCards) { alert('Assign at least one card to a pile first!'); return; }
-
-  gameState = pileAssignments.map((cards, i) => ({
+  piles = pileAssignments.map((pa, i) => ({
     name: pileNames[i],
-    cards: cards.length > 0 ? shuffle([...cards]) : [],
-    currentDrawn: null,
-    isEmpty: cards.length === 0
+    cards: shuffle([...pa]),
+    original: [...pa],
+    currentDrawn: null
   }));
-
   renderPlayScreen();
   showScreen('play-screen');
 }
 
 function renderPlayScreen() {
-  const container = document.getElementById('piles-container');
-  container.innerHTML = '';
-
-  gameState.forEach((pile, i) => {
-    if (pile.isEmpty) return; // skip piles with no cards
-
-    const area = document.createElement('div');
-    area.className = 'pile-area';
-    area.id = `pile-area-${i}`;
-
-    // Drawn card slot
-    const drawnSlot = document.createElement('div');
-    drawnSlot.id = `drawn-${i}`;
-    renderDrawnSlot(drawnSlot, pile.currentDrawn);
-
-    // Pile stack
-    const stack = document.createElement('div');
-    stack.className = 'pile-stack' + (pile.cards.length === 0 ? ' empty' : '');
-    stack.id = `stack-${i}`;
-    stack.innerHTML = stackHTML(pile.cards.length);
-
-    // Pile name
-    const nameLabel = document.createElement('div');
-    nameLabel.className = 'pile-name-label';
-    nameLabel.textContent = pile.name;
-
-    // Button
-    const btn = document.createElement('button');
-    btn.id = `btn-${i}`;
-    if (pile.cards.length === 0) {
-      btn.className = 'select-btn shuffle';
-      btn.textContent = '🔀 Shuffle';
-      btn.onclick = () => shufflePile(i);
-    } else {
-      btn.className = 'select-btn';
-      btn.textContent = '🎴 Select';
-      btn.onclick = () => drawCard(i);
-    }
-
-    area.appendChild(drawnSlot);
-    area.appendChild(stack);
-    area.appendChild(nameLabel);
-    area.appendChild(btn);
-    container.appendChild(area);
+  const grid = document.getElementById('piles-grid');
+  grid.innerHTML = '';
+  piles.forEach((pile, i) => {
+    const box = document.createElement('div');
+    box.className = 'pile-card-box';
+    box.innerHTML = `
+      <h3>${pile.name}</h3>
+      <div id="drawn-${i}" class="drawn-card empty-slot"></div>
+      <div id="stack-${i}" class="pile-stack ${pile.cards.length === 0 ? 'empty' : ''}" onclick="drawCard(${i})">
+        ${stackHTML(pile.cards.length)}
+      </div>
+      <button id="btn-${i}" class="select-btn" onclick="drawCard(${i})">🎴 Draw Card</button>
+      <button class="select-btn btn-blue" style="background:#2980b9;margin-top:6px;" onclick="openDrawSetModal(${i})">🎲 Draw a Set</button>
+    `;
+    grid.appendChild(box);
+    renderDrawnSlot(box.querySelector(`#drawn-${i}`), pile.currentDrawn);
   });
 }
 
-function drawCard(pileIndex) {
-  const pile = gameState[pileIndex];
-  if (pile.cards.length === 0) return;
+function stackHTML(count) {
+  if (count === 0) return `<div><div class="pile-count">0</div><div class="pile-label">cards</div></div>`;
+  return `<div class="stack-overlay"><img class="card-back-img" src="${CARD_BACK_URL}" alt="card back"><div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.6);border-radius:4px;padding:1px 5px;font-size:0.8rem;">${count}</div></div>`;
+}
 
-  pile.currentDrawn = pile.cards.pop();
-
-  // Update drawn card display
-  const drawnEl = document.getElementById(`drawn-${pileIndex}`);
-  renderDrawnSlot(drawnEl, pile.currentDrawn);
-
-  // Update stack
-  const stackEl = document.getElementById(`stack-${pileIndex}`);
-  stackEl.className = 'pile-stack' + (pile.cards.length === 0 ? ' empty' : '');
-  stackEl.innerHTML = stackHTML(pile.cards.length);
-
-  // Update button
-  const btn = document.getElementById(`btn-${pileIndex}`);
-  if (pile.cards.length === 0) {
-    btn.className = 'select-btn shuffle';
-    btn.textContent = '🔀 Shuffle';
-    btn.onclick = () => shufflePile(pileIndex);
+function renderDrawnSlot(el, card) {
+  if (!card) {
+    el.className = 'drawn-card empty-slot';
+    el.innerHTML = '';
+    return;
+  }
+  el.className = 'drawn-card';
+  if (card === 'Joker1' || card === 'Joker2') {
+    el.innerHTML = `<div class="joker-face">🃏</div>`;
+  } else {
+    const url = cardImageUrl(card);
+    el.innerHTML = `<img class="card-img" src="${url}" alt="${cardDisplayName(card)}">`;
   }
 }
 
-function shufflePile(pileIndex) {
-  const pile = gameState[pileIndex];
-  // Restore original assignment and reshuffle
-  pile.cards = shuffle([...pileAssignments[pileIndex]]);
-  pile.currentDrawn = null;
-
-  // Reset drawn card slot
+function drawCard(pileIndex) {
+  const pile = piles[pileIndex];
+  if (pile.cards.length === 0) return;
+  pile.currentDrawn = pile.cards.pop();
   const drawnEl = document.getElementById(`drawn-${pileIndex}`);
-  drawnEl.className = 'drawn-card empty-slot';
-  drawnEl.textContent = '';
+  renderDrawnSlot(drawnEl, pile.currentDrawn);
+  const stackEl = document.getElementById(`stack-${pileIndex}`);
+  stackEl.className = 'pile-stack' + (pile.cards.length === 0 ? ' empty' : '');
+  stackEl.innerHTML = stackHTML(pile.cards.length);
+  const btn = document.getElementById(`btn-${pileIndex}`);
+  if (pile.cards.length === 0) {
+    btn.className = 'select-btn shuffle';
+    btn.textContent = '🔀 Shuffle Pile';
+    btn.onclick = () => reshufflePile(pileIndex);
+  }
+}
 
-  // Update stack
+function reshufflePile(pileIndex) {
+  const pile = piles[pileIndex];
+  pile.cards = shuffle([...pile.original]);
+  pile.currentDrawn = null;
+  const drawnEl = document.getElementById(`drawn-${pileIndex}`);
+  renderDrawnSlot(drawnEl, null);
   const stackEl = document.getElementById(`stack-${pileIndex}`);
   stackEl.className = 'pile-stack';
-  stackEl.innerHTML = `<div><div class="pile-count">${pile.cards.length}</div><div class="pile-label">cards</div></div>`;
-
-  // Update button
+  stackEl.innerHTML = stackHTML(pile.cards.length);
   const btn = document.getElementById(`btn-${pileIndex}`);
   btn.className = 'select-btn';
-  btn.textContent = '🎴 Select';
+  btn.textContent = '🎴 Draw Card';
   btn.onclick = () => drawCard(pileIndex);
+}
+
+// ── DRAW SET FEATURE ──────────────────────────────────────────
+let drawSetPileIndex = -1;
+
+function openDrawSetModal(pileIndex) {
+  const pile = piles[pileIndex];
+  drawSetPileIndex = pileIndex;
+  document.getElementById('draw-set-pile-name').textContent = `From: ${pile.name}`;
+  const maxCards = pile.cards.length;
+  const input = document.getElementById('draw-count-input');
+  input.max = maxCards;
+  input.value = Math.min(5, maxCards);
+  document.getElementById('draw-count-max').textContent = `(${maxCards} cards remaining in pile)`;
+  document.getElementById('draw-set-modal').classList.add('open');
+}
+
+function closeDrawSetModal() {
+  document.getElementById('draw-set-modal').classList.remove('open');
+  drawSetPileIndex = -1;
+}
+
+function confirmDrawSet() {
+  const pile = piles[drawSetPileIndex];
+  let count = parseInt(document.getElementById('draw-count-input').value) || 1;
+  count = Math.max(1, Math.min(count, pile.cards.length));
+  // Draw 'count' cards from the top of the pile
+  const drawn = pile.cards.splice(pile.cards.length - count, count);
+  // Shuffle the drawn set
+  const shuffled = shuffle(drawn);
+  closeDrawSetModal();
+  // Update pile display
+  const stackEl = document.getElementById(`stack-${drawSetPileIndex}`);
+  stackEl.className = 'pile-stack' + (pile.cards.length === 0 ? ' empty' : '');
+  stackEl.innerHTML = stackHTML(pile.cards.length);
+  const btn = document.getElementById(`btn-${drawSetPileIndex}`);
+  if (pile.cards.length === 0) {
+    btn.className = 'select-btn shuffle';
+    btn.textContent = '🔀 Shuffle Pile';
+    btn.onclick = () => reshufflePile(drawSetPileIndex);
+  }
+  // Go to reveal screen
+  startReveal(drawSetPileIndex, shuffled, drawn);
+}
+
+function startReveal(pileIndex, shuffledDeck, originalDrawn) {
+  revealPileIndex = pileIndex;
+  revealDeck = shuffledDeck;
+  revealIndex = 0;
+  revealOriginal = originalDrawn;
+  document.getElementById('reveal-pile-title').textContent = `🎲 Set from: ${piles[pileIndex].name}`;
+  document.getElementById('reveal-info').textContent = `${shuffledDeck.length} cards drawn and shuffled. Reveal them one by one.`;
+  renderRevealScreen();
+  showScreen('reveal-screen');
+}
+
+function renderRevealScreen() {
+  const slot = document.getElementById('reveal-slot');
+  slot.className = 'reveal-card-slot empty-slot';
+  slot.innerHTML = '';
+  document.getElementById('reveal-progress').textContent = `0 of ${revealDeck.length} revealed`;
+  const listEl = document.getElementById('drawn-set-list');
+  listEl.innerHTML = '';
+  revealDeck.forEach((card, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'drawn-set-chip';
+    chip.id = `reveal-chip-${i}`;
+    chip.textContent = '?';
+    listEl.appendChild(chip);
+  });
+  const btn = document.getElementById('reveal-btn');
+  btn.style.display = '';
+  btn.textContent = '🃏 Reveal Next Card';
+}
+
+function revealNext() {
+  if (revealIndex >= revealDeck.length) return;
+  const card = revealDeck[revealIndex];
+  const slot = document.getElementById('reveal-slot');
+  slot.className = 'reveal-card-slot';
+  if (card === 'Joker1' || card === 'Joker2') {
+    slot.innerHTML = `<div class="reveal-joker">🃏</div>`;
+  } else {
+    const url = cardImageUrl(card);
+    slot.innerHTML = `<img class="reveal-card-img" src="${url}" alt="${cardDisplayName(card)}">`;
+  }
+  // Update chip
+  const chip = document.getElementById(`reveal-chip-${revealIndex}`);
+  chip.textContent = cardDisplayName(card);
+  chip.classList.add('revealed');
+  revealIndex++;
+  document.getElementById('reveal-progress').textContent = `${revealIndex} of ${revealDeck.length} revealed`;
+  if (revealIndex >= revealDeck.length) {
+    document.getElementById('reveal-btn').textContent = '✅ All Revealed';
+    document.getElementById('reveal-btn').disabled = true;
+  }
+}
+
+function backToPlay() {
+  showScreen('play-screen');
 }
 
 function showScreen(id) {
