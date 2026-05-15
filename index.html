@@ -1,610 +1,477 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Deck of Cards Picker</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', sans-serif; background: #1a6b3c; color: #fff; min-height: 100vh; padding: 20px; }
-  h1 { text-align: center; margin-bottom: 20px; font-size: 1.8rem; text-shadow: 1px 1px 3px #000; }
-  .screen { display: none; }
-  .screen.active { display: block; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deck & Tarot Picker</title>
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #1a1a1a; color: #e0e0e0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card-chip { transition: all 0.2s ease; cursor: pointer; border: 1px solid #444; }
+        .card-chip:hover { transform: translateY(-2px); border-color: #666; }
+        .card-chip.selected { background-color: #3b82f6; border-color: #60a5fa; color: white; }
+        .card-chip.disabled { opacity: 0.3; cursor: not-allowed; grayscale: 1; }
 
-  /* SETUP */
-  #setup-screen { max-width: 400px; margin: 60px auto; background: rgba(0,0,0,0.4); border-radius: 12px; padding: 30px; text-align: center; }
-  #setup-screen label { display: block; margin-bottom: 10px; font-size: 1.1rem; }
-  #pile-count { font-size: 1.4rem; width: 80px; text-align: center; padding: 8px; border-radius: 8px; border: none; }
-  .btn { background: #e8c84a; color: #1a3a1a; border: none; padding: 10px 24px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 16px; }
-  .btn:hover { background: #f0d860; }
-  .btn-danger { background: #c0392b; color: #fff; }
-  .btn-danger:hover { background: #e74c3c; }
-  .btn-blue { background: #2980b9; color: #fff; }
-  .btn-blue:hover { background: #3498db; }
-  .btn-purple { background: #8e44ad; color: #fff; }
-  .btn-purple:hover { background: #9b59b6; }
+        .pile-card { position: absolute; width: 120px; height: 180px; border-radius: 8px; border: 2px solid white; box-shadow: 0 4px 6px rgba(0,0,0,0.3); background: #2d2d2d; transition: transform 0.3s ease; }
+        .card-img { width: 100%; height: 100%; border-radius: 6px; object-fit: cover; }
 
-  /* ASSIGN */
-  #assign-screen { max-width: 900px; margin: 0 auto; }
-  .pile-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
-  .pile-tab { background: rgba(0,0,0,0.3); border: 2px solid transparent; border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; }
-  .pile-tab.active { border-color: #e8c84a; background: rgba(232,200,74,0.2); }
-  .pile-tab .rename-icon { font-size: 0.75rem; opacity: 0.6; cursor: pointer; }
-  .pile-tab .rename-icon:hover { opacity: 1; }
-  .pile-tab input.rename-input { background: transparent; border: none; border-bottom: 1px solid #e8c84a; color: #fff; font-size: 0.95rem; width: 80px; outline: none; }
-  .assign-layout { display: flex; gap: 16px; }
-  .card-grid-wrap { flex: 1; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; }
-  .suit-quick-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-  .suit-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; }
-  .suit-btn:hover { background: rgba(255,255,255,0.3); }
-  .suit-btn.face-btn { background: rgba(232,200,74,0.3); }
-  .suit-btn.joker-btn { background: rgba(142,68,173,0.4); }
-  .suit-btn.joker-remove { background: rgba(192,57,43,0.4); }
-  .card-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-  .card-chip { background: #fff; color: #222; border-radius: 6px; padding: 4px 8px; font-size: 0.82rem; cursor: pointer; border: 2px solid transparent; user-select: none; }
-  .card-chip:hover { border-color: #e8c84a; }
-  .card-chip.selected { background: #e8c84a; color: #1a3a1a; border-color: #c8a820; }
-  .card-chip.hearts, .card-chip.diamonds { color: #c0392b; }
-  .card-chip.spades, .card-chip.clubs { color: #1a1a1a; }
-  .card-chip.joker { background: #8e44ad; color: #fff; }
-  .card-chip.joker.selected { background: #6c3483; border-color: #9b59b6; }
-  .pile-cards-wrap { width: 200px; background: rgba(0,0,0,0.3); border-radius: 10px; padding: 14px; }
-  .pile-cards-wrap h3 { margin-bottom: 8px; font-size: 0.95rem; }
-  .pile-card-list { display: flex; flex-wrap: wrap; gap: 4px; min-height: 40px; }
-  .assign-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-  .avail-count { font-size: 0.85rem; opacity: 0.7; margin-bottom: 8px; }
+        .deck-option { cursor: pointer; transition: transform 0.3s ease, border-color 0.3s ease; border: 4px solid transparent; }
+        .deck-option:hover { transform: scale(1.05); border-color: #3b82f6; }
 
-  /* PLAY */
-  #play-screen { max-width: 1000px; margin: 0 auto; }
-  .play-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-  .piles-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-  .pile-card-box { background: rgba(0,0,0,0.35); border-radius: 12px; padding: 16px; text-align: center; min-width: 160px; }
-  .pile-card-box h3 { margin-bottom: 10px; font-size: 1rem; }
-  .pile-stack { width: 90px; height: 120px; background: #2c3e50; border-radius: 8px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #4a6fa5; position: relative; }
-  .pile-stack.empty { background: #1a252f; border-color: #2c3e50; cursor: default; }
-  .pile-count { font-size: 1.6rem; font-weight: bold; }
-  .pile-label { font-size: 0.75rem; opacity: 0.7; }
-  .drawn-card { width: 90px; height: 120px; margin: 0 auto 10px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; }
-  .drawn-card.empty-slot { background: rgba(255,255,255,0.05); border: 2px dashed rgba(255,255,255,0.2); }
-  .select-btn { background: #27ae60; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; cursor: pointer; font-weight: bold; width: 100%; }
-  .select-btn:hover { background: #2ecc71; }
-  .select-btn.shuffle { background: #e67e22; }
-  .select-btn.shuffle:hover { background: #f39c12; }
-  .card-img { width: 88px; height: 118px; border-radius: 6px; object-fit: cover; }
-  .card-back-img { width: 88px; height: 118px; border-radius: 6px; }
-  .joker-face { width: 88px; height: 118px; border-radius: 6px; background: linear-gradient(135deg,#8e44ad,#3498db); display:flex; align-items:center; justify-content:center; font-size:2.5rem; }
-  .stack-overlay { position:relative; display:inline-block; }
-  .stack-overlay::after { content:''; position:absolute; top:4px; left:4px; right:-4px; bottom:-4px; background:rgba(0,0,0,0.3); border-radius:6px; z-index:-1; }
+        .reversed { transform: rotate(180deg); }
 
-  /* DRAW SET MODAL */
-  .modal-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:100; align-items:center; justify-content:center; }
-  .modal-overlay.open { display:flex; }
-  .modal-box { background:#1e5c38; border-radius:14px; padding:28px; max-width:480px; width:90%; text-align:center; }
-  .modal-box h2 { margin-bottom:16px; }
-  .modal-box p { margin-bottom:12px; font-size:0.95rem; opacity:0.85; }
-  .draw-count-input { font-size:1.3rem; width:80px; text-align:center; padding:8px; border-radius:8px; border:none; margin-bottom:16px; }
-  .modal-actions { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-
-  /* REVEAL SCREEN */
-  #reveal-screen { max-width:600px; margin:0 auto; text-align:center; }
-  .reveal-info { margin-bottom:20px; font-size:1rem; opacity:0.85; }
-  .reveal-card-area { display:flex; flex-direction:column; align-items:center; gap:16px; margin-bottom:24px; }
-  .reveal-card-slot { width:120px; height:160px; border-radius:10px; display:flex; align-items:center; justify-content:center; }
-  .reveal-card-slot.empty-slot { background:rgba(255,255,255,0.05); border:2px dashed rgba(255,255,255,0.2); }
-  .reveal-card-img { width:118px; height:158px; border-radius:8px; object-fit:cover; }
-  .reveal-joker { width:118px; height:158px; border-radius:8px; background:linear-gradient(135deg,#8e44ad,#3498db); display:flex; align-items:center; justify-content:center; font-size:3rem; }
-  .reveal-progress { font-size:0.9rem; opacity:0.7; margin-bottom:8px; }
-  .drawn-set-list { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:20px; }
-  .drawn-set-chip { background:rgba(255,255,255,0.15); border-radius:6px; padding:3px 8px; font-size:0.8rem; }
-  .drawn-set-chip.revealed { background:rgba(232,200,74,0.4); }
-</style>
+        /* Modal Scroll */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #2d2d2d; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+    </style>
 </head>
 <body>
-<h1>🃏 Deck of Cards Picker</h1>
+    <div id="artifact_react"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-<!-- SETUP SCREEN -->
-<div id="setup-screen" class="screen active">
-  <label for="pile-count">How many piles? (1–6)</label>
-  <input type="number" id="pile-count" min="1" max="6" value="2">
-  <br>
-  <button class="btn" onclick="goToAssign()">Next: Assign Cards →</button>
-</div>
+        // Constants
+        const STANDARD_SUITS = ['Spades', 'Hearts', 'Diamonds', 'Clubs'];
+        const STANDARD_RANKS = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King'];
 
-<!-- ASSIGN SCREEN -->
-<div id="assign-screen" class="screen">
-  <div class="pile-tabs" id="pile-tabs"></div>
-  <div class="assign-layout">
-    <div class="card-grid-wrap">
-      <div class="suit-quick-btns" id="suit-quick-btns"></div>
-      <div class="avail-count" id="avail-count"></div>
-      <div class="card-grid" id="card-grid"></div>
-    </div>
-    <div class="pile-cards-wrap">
-      <h3>Cards in pile:</h3>
-      <div class="pile-card-list" id="pile-card-list"></div>
-    </div>
-  </div>
-  <div class="assign-actions">
-    <button class="btn btn-danger" onclick="resetAssign()">↺ Reset All</button>
-    <button class="btn" onclick="goToPlay()">▶ Start Game</button>
-  </div>
-</div>
+        const TAROT_SUITS = ['Wands', 'Cups', 'Swords', 'Pentacles'];
+        const TAROT_RANKS = ['Ace', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Page', 'Knight', 'Queen', 'King'];
+        const MAJOR_ARCANA = [
+            "The Fool", "The Magician", "The High Priestess", "The Empress", "The Emperor", 
+            "The Hierophant", "The Lovers", "The Chariot", "Strength", "The Hermit", 
+            "Wheel of Fortune", "Justice", "The Hanged Man", "Death", "Temperance", 
+            "The Devil", "The Tower", "The Star", "The Moon", "The Sun", "Judgement", "The World"
+        ];
 
-<!-- PLAY SCREEN -->
-<div id="play-screen" class="screen">
-  <div class="play-header">
-    <button class="btn btn-danger" onclick="goToAssign()">← Back to Assign</button>
-    <span style="font-size:1rem;opacity:0.8;">Click a pile to draw a card</span>
-  </div>
-  <div class="piles-grid" id="piles-grid"></div>
-</div>
+        const App = () => {
+            const [view, setView] = useState('DECK_SELECT'); // DECK_SELECT, SETUP, ASSIGN, PLAY, REVEAL
+            const [deckType, setDeckType] = useState(null); // 'STANDARD' or 'TAROT'
+            const [numPiles, setNumPiles] = useState(1);
+            const [piles, setPiles] = useState([]);
+            const [activePileIdx, setActivePileIdx] = useState(0);
+            const [isEditingName, setIsEditingName] = useState(false);
+            const [allowReversals, setAllowReversals] = useState(false);
 
-<!-- DRAW SET MODAL -->
-<div class="modal-overlay" id="draw-set-modal">
-  <div class="modal-box">
-    <h2>🎲 Draw a Set</h2>
-    <p id="draw-set-pile-name">From: Pile 1</p>
-    <p>How many cards to draw randomly?</p>
-    <input type="number" class="draw-count-input" id="draw-count-input" min="1" value="5">
-    <p id="draw-count-max" style="font-size:0.8rem;opacity:0.6;"></p>
-    <div class="modal-actions">
-      <button class="btn btn-danger" onclick="closeDrawSetModal()">Cancel</button>
-      <button class="btn btn-purple" onclick="confirmDrawSet()">🔀 Draw & Shuffle</button>
-    </div>
-  </div>
-</div>
+            // Modal for Draw Set
+            const [showDrawModal, setShowDrawModal] = useState(false);
+            const [drawCount, setDrawCount] = useState(3);
 
-<!-- REVEAL SCREEN -->
-<div id="reveal-screen" class="screen">
-  <div class="play-header">
-    <button class="btn btn-blue" onclick="backToPlay()">← Back to Piles</button>
-    <span id="reveal-pile-title" style="font-size:1.1rem;font-weight:bold;"></span>
-  </div>
-  <div class="reveal-info" id="reveal-info"></div>
-  <div class="reveal-card-area">
-    <div class="reveal-card-slot empty-slot" id="reveal-slot"></div>
-  </div>
-  <div class="reveal-progress" id="reveal-progress"></div>
-  <div class="drawn-set-list" id="drawn-set-list"></div>
-  <button class="btn btn-purple" id="reveal-btn" onclick="revealNext()">🃏 Reveal Next Card</button>
-</div>
+            // Reveal State
+            const [revealSet, setRevealSet] = useState([]);
+            const [revealIdx, setRevealIdx] = useState(-1);
 
-<script>
-const SUITS = ['♠','♥','♦','♣'];
-const SUIT_NAMES = ['spades','hearts','diamonds','clubs'];
-const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-const FACE_RANKS = ['J','Q','K'];
-const CARD_IMG_BASE = 'https://deckofcardsapi.com/static/img/';
-const CARD_BACK_URL = 'https://deckofcardsapi.com/static/img/back.png';
-const SUIT_TO_API = {'♠':'S','♥':'H','♦':'D','♣':'C'};
+            // Generate initial deck based on type
+            const getAllCards = (type) => {
+                if (type === 'STANDARD') {
+                    const deck = [];
+                    STANDARD_SUITS.forEach(s => STANDARD_RANKS.forEach(r => deck.push({ id: `${r} of ${s}`, rank: r, suit: s, type: 'standard' })));
+                    deck.push({ id: 'Joker 1', rank: 'Joker', suit: 'None', type: 'joker' });
+                    deck.push({ id: 'Joker 2', rank: 'Joker', suit: 'None', type: 'joker' });
+                    return deck;
+                } else {
+                    const deck = [];
+                    // Major Arcana
+                    MAJOR_ARCANA.forEach(m => deck.push({ id: m, rank: m, suit: 'Major', type: 'tarot-major' }));
+                    // Minor Arcana
+                    TAROT_SUITS.forEach(s => TAROT_RANKS.forEach(r => deck.push({ id: `${r} of ${s}`, rank: r, suit: s, type: 'tarot-minor' })));
+                    return deck;
+                }
+            };
 
-let numPiles = 2;
-let pileNames = [];
-let pileAssignments = [];
-let activePileIndex = 0;
-let jokerAssigned = [-1,-1];
+            const [fullDeck, setFullDeck] = useState([]);
 
-// Play state
-let piles = [];
+            // Helper: Get Image URL
+            const getCardImage = (card, isReversed) => {
+                if (deckType === 'STANDARD') {
+                    if (card.rank === 'Joker') return "https://deckofcardsapi.com/static/img/X1.png";
+                    const suitMap = { Spades: 'S', Hearts: 'H', Diamonds: 'D', Clubs: 'C' };
+                    const rankMap = { Ace: 'A', '10': '0', Jack: 'J', Queen: 'Q', King: 'K' };
+                    const code = (rankMap[card.rank] || card.rank) + suitMap[card.suit];
+                    return `https://deckofcardsapi.com/static/img/${code}.png`;
+                } else {
+                    const prefix = "MW_";
+                    const ext = ".jpg";
+                    if (card.type === 'tarot-major') {
+                        const name = card.rank.replace(/ /g, '_');
+                        return `assets/MAJOR ARCANA/${prefix}${name}${ext}`;
+                    } else {
+                        const rank = card.rank;
+                        const suit = card.suit;
+                        return `assets/MINOR ARCANA/${prefix}${rank}_of_${suit}${ext}`;
+                    }
+                }
+            };
 
-// Reveal state
-let revealPileIndex = -1;
-let revealDeck = [];
-let revealIndex = 0;
-let revealOriginal = [];
+            const toggleCardInPile = (cardId) => {
+                const newPiles = [...piles];
+                const currentPile = newPiles[activePileIdx];
 
-function cardApiCode(card) {
-  if (card === 'Joker1' || card === 'Joker2') return null;
-  const [suit, ...rankParts] = card.split('-');
-  const rank = rankParts.join('-');
-  const r = rank === '10' ? '0' : rank;
-  return r + SUIT_TO_API[suit];
-}
+                if (currentPile.cards.includes(cardId)) {
+                    currentPile.cards = currentPile.cards.filter(id => id !== cardId);
+                } else {
+                    // Remove from other piles first
+                    newPiles.forEach(p => p.cards = p.cards.filter(id => id !== cardId));
+                    currentPile.cards.push(cardId);
+                }
+                setPiles(newPiles);
+            };
 
-function cardImageUrl(card) {
-  const code = cardApiCode(card);
-  if (!code) return null;
-  return CARD_IMG_BASE + code + '.png';
-}
+            const handleDeckSelect = (type) => {
+                setDeckType(type);
+                setFullDeck(getAllCards(type));
+                setView('SETUP');
+            };
 
-function cardDisplayName(card) {
-  if (card === 'Joker1') return '🃏 Joker 1';
-  if (card === 'Joker2') return '🃏 Joker 2';
-  const [suit, ...rankParts] = card.split('-');
-  return rankParts.join('-') + suit;
-}
+            const startApp = () => {
+                const initialPiles = Array.from({ length: numPiles }, (_, i) => ({
+                    id: i,
+                    name: `Pile ${i + 1}`,
+                    cards: [],
+                    currentStack: [],
+                    drawn: null
+                }));
+                setPiles(initialPiles);
+                setView('ASSIGN');
+            };
 
-function cardSuitClass(card) {
-  if (card === 'Joker1' || card === 'Joker2') return 'joker';
-  const suit = card.split('-')[0];
-  return SUIT_NAMES[SUITS.indexOf(suit)];
-}
+            const finalizeAssignments = () => {
+                const newPiles = piles.map(p => {
+                    const shuffled = [...p.cards].sort(() => Math.random() - 0.5);
+                    return { ...p, currentStack: shuffled, drawn: null };
+                });
+                setPiles(newPiles);
+                setView('PLAY');
+            };
 
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
+            const drawOne = (pileIdx) => {
+                const newPiles = [...piles];
+                const pile = newPiles[pileIdx];
+                if (pile.currentStack.length === 0) return;
 
-function goToAssign() {
-  numPiles = parseInt(document.getElementById('pile-count').value) || 2;
-  numPiles = Math.max(1, Math.min(6, numPiles));
-  pileNames = Array.from({length: numPiles}, (_, i) => `Pile ${i+1}`);
-  pileAssignments = Array.from({length: numPiles}, () => []);
-  jokerAssigned = [-1,-1];
-  activePileIndex = 0;
-  buildAssignScreen();
-  showScreen('assign-screen');
-}
+                const cardId = pile.currentStack.pop();
+                const cardData = fullDeck.find(d => d.id === cardId);
+                const reversed = allowReversals && Math.random() > 0.5;
 
-function buildAssignScreen() {
-  buildPileTabs();
-  buildSuitQuickBtns();
-  renderCardGrid();
-  renderPileCards();
-}
+                pile.drawn = { ...cardData, isReversed: reversed };
+                setPiles(newPiles);
+            };
 
-function buildPileTabs() {
-  const tabs = document.getElementById('pile-tabs');
-  tabs.innerHTML = '';
-  for (let i = 0; i < numPiles; i++) {
-    const tab = document.createElement('div');
-    tab.className = 'pile-tab' + (i === activePileIndex ? ' active' : '');
-    tab.innerHTML = `<span class="tab-label" ondblclick="startRenamePile(${i})">${pileNames[i]}</span><span class="rename-icon" onclick="startRenamePile(${i})">✏️</span>`;
-    tab.onclick = (e) => { if (!e.target.classList.contains('rename-icon') && e.target.tagName !== 'INPUT') { activePileIndex = i; buildAssignScreen(); } };
-    tabs.appendChild(tab);
-  }
-}
+            const shufflePile = (pileIdx) => {
+                const newPiles = [...piles];
+                newPiles[pileIdx].currentStack = [...newPiles[pileIdx].cards].sort(() => Math.random() - 0.5);
+                newPiles[pileIdx].drawn = null;
+                setPiles(newPiles);
+            };
 
-function startRenamePile(index) {
-  const tabs = document.getElementById('pile-tabs');
-  const tab = tabs.children[index];
-  const labelEl = tab.querySelector('.tab-label');
-  const input = document.createElement('input');
-  input.className = 'rename-input';
-  input.value = pileNames[index];
-  tab.replaceChild(input, labelEl);
-  input.focus();
-  input.select();
-  const commitRename = () => {
-    const newName = input.value.trim() || pileNames[index];
-    pileNames[index] = newName;
-    buildPileTabs();
-    buildSuitQuickBtns();
-  };
-  input.onblur = commitRename;
-  input.onkeydown = (e) => {
-    if (e.key === 'Enter') input.blur();
-    if (e.key === 'Escape') { input.value = pileNames[index]; input.blur(); }
-  };
-}
+            const triggerDrawSet = (pileIdx) => {
+                setActivePileIdx(pileIdx);
+                const max = piles[pileIdx].currentStack.length;
+                setDrawCount(Math.min(3, max));
+                setShowDrawModal(true);
+            };
 
-function buildSuitQuickBtns() {
-  const container = document.getElementById('suit-quick-btns');
-  container.innerHTML = '';
-  SUITS.forEach((suit, si) => {
-    const btn = document.createElement('button');
-    btn.className = 'suit-btn';
-    btn.textContent = `All ${suit}`;
-    btn.onclick = () => addSuitToPile(suit);
-    container.appendChild(btn);
-  });
-  const faceBtn = document.createElement('button');
-  faceBtn.className = 'suit-btn face-btn';
-  faceBtn.textContent = '👑 All Face Cards';
-  faceBtn.onclick = addFaceCardsToPile;
-  container.appendChild(faceBtn);
-  for (let j = 0; j < 2; j++) {
-    const jBtn = document.createElement('button');
-    if (jokerAssigned[j] === activePileIndex) {
-      jBtn.className = 'suit-btn joker-remove';
-      jBtn.textContent = `Remove Joker ${j+1}`;
-      jBtn.onclick = () => removeJokerFromPile(j);
-    } else if (jokerAssigned[j] !== -1) {
-      jBtn.className = 'suit-btn joker-btn';
-      jBtn.textContent = `🃏 Joker ${j+1} (in ${pileNames[jokerAssigned[j]]})`;
-      jBtn.disabled = true;
-      jBtn.style.opacity = '0.5';
-    } else {
-      jBtn.className = 'suit-btn joker-btn';
-      jBtn.textContent = `🃏 Add Joker ${j+1}`;
-      jBtn.onclick = () => addJokerToPile(j);
-    }
-    container.appendChild(jBtn);
-  }
-}
+            const startReveal = () => {
+                const newPiles = [...piles];
+                const pile = newPiles[activePileIdx];
+                const set = [];
+                for(let i=0; i<drawCount; i++) {
+                    const id = pile.currentStack.pop();
+                    const data = fullDeck.find(d => d.id === id);
+                    const reversed = allowReversals && Math.random() > 0.5;
+                    set.push({ ...data, isReversed: reversed });
+                }
+                // Secretly shuffle the set
+                set.sort(() => Math.random() - 0.5);
 
-function addSuitToPile(suit) {
-  RANKS.forEach(rank => {
-    const card = `${suit}-${rank}`;
-    const alreadyInOther = pileAssignments.some((pa, i) => i !== activePileIndex && pa.includes(card));
-    if (!alreadyInOther && !pileAssignments[activePileIndex].includes(card)) {
-      pileAssignments[activePileIndex].push(card);
-    }
-  });
-  renderCardGrid();
-  renderPileCards();
-}
+                setRevealSet(set);
+                setRevealIdx(-1);
+                setShowDrawModal(false);
+                setView('REVEAL');
+                setPiles(newPiles);
+            };
 
-function addFaceCardsToPile() {
-  SUITS.forEach(suit => {
-    FACE_RANKS.forEach(rank => {
-      const card = `${suit}-${rank}`;
-      const alreadyInOther = pileAssignments.some((pa, i) => i !== activePileIndex && pa.includes(card));
-      if (!alreadyInOther && !pileAssignments[activePileIndex].includes(card)) {
-        pileAssignments[activePileIndex].push(card);
-      }
-    });
-  });
-  renderCardGrid();
-  renderPileCards();
-}
+            // Quick Assignment Helpers
+            const addSuit = (suit) => {
+                const cards = fullDeck.filter(c => c.suit === suit).map(c => c.id);
+                const newPiles = [...piles];
+                newPiles.forEach(p => p.cards = p.cards.filter(id => !cards.includes(id)));
+                newPiles[activePileIdx].cards = [...new Set([...newPiles[activePileIdx].cards, ...cards])];
+                setPiles(newPiles);
+            };
 
-function addJokerToPile(j) {
-  const jokerCard = j === 0 ? 'Joker1' : 'Joker2';
-  jokerAssigned[j] = activePileIndex;
-  pileAssignments[activePileIndex].push(jokerCard);
-  buildSuitQuickBtns();
-  renderCardGrid();
-  renderPileCards();
-}
+            const addMajorArcana = () => {
+                const cards = fullDeck.filter(c => c.type === 'tarot-major').map(c => c.id);
+                const newPiles = [...piles];
+                newPiles.forEach(p => p.cards = p.cards.filter(id => !cards.includes(id)));
+                newPiles[activePileIdx].cards = [...new Set([...newPiles[activePileIdx].cards, ...cards])];
+                setPiles(newPiles);
+            };
 
-function removeJokerFromPile(j) {
-  const jokerCard = j === 0 ? 'Joker1' : 'Joker2';
-  pileAssignments[activePileIndex] = pileAssignments[activePileIndex].filter(c => c !== jokerCard);
-  jokerAssigned[j] = -1;
-  buildSuitQuickBtns();
-  renderCardGrid();
-  renderPileCards();
-}
+            // Render Logic
+            if (view === 'DECK_SELECT') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center p-8">
+                        <h1 className="text-4xl font-bold mb-12 text-blue-400">Select Your Deck</h1>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 w-full max-w-4xl">
+                            <div className="deck-option bg-gray-800 rounded-xl overflow-hidden shadow-2xl" onClick={() => handleDeckSelect('STANDARD')}>
+                                <img src="assets/standard_deck.jpg" alt="Standard Deck" className="w-full h-64 object-cover" onError={(e) => e.target.src="https://placehold.co/600x400?text=Standard+Deck"} />
+                                <div className="p-6 text-center">
+                                    <h2 className="text-2xl font-bold">Standard Playing Cards</h2>
+                                    <p className="text-gray-400 mt-2">52 Cards + 2 Jokers</p>
+                                </div>
+                            </div>
+                            <div className="deck-option bg-gray-800 rounded-xl overflow-hidden shadow-2xl" onClick={() => handleDeckSelect('TAROT')}>
+                                <img src="assets/tarot_deck.jpg" alt="Tarot Deck" className="w-full h-64 object-cover" onError={(e) => e.target.src="https://placehold.co/600x400?text=Tarot+Deck"} />
+                                <div className="p-6 text-center">
+                                    <h2 className="text-2xl font-bold">Tarot Deck</h2>
+                                    <p className="text-gray-400 mt-2">78 Cards (Major & Minor Arcana)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
 
-function resetAssign() {
-  pileAssignments = Array.from({length: numPiles}, () => []);
-  jokerAssigned = [-1,-1];
-  activePileIndex = 0;
-  buildAssignScreen();
-}
+            if (view === 'SETUP') {
+                return (
+                    <div className="min-h-screen flex flex-col items-center justify-center">
+                        <div className="bg-gray-800 p-8 rounded-2xl shadow-xl text-center w-96 border border-gray-700">
+                            <h2 className="text-2xl font-bold mb-6">How many piles?</h2>
+                            <div className="flex justify-center gap-4 mb-8">
+                                {[1,2,3,4,5,6].map(n => (
+                                    <button key={n} onClick={() => setNumPiles(n)} 
+                                        className={`w-10 h-10 rounded-full font-bold transition ${numPiles === n ? 'bg-blue-500 scale-110 shadow-lg' : 'bg-gray-700 hover:bg-gray-600'}`}>
+                                        {n}
+                                    </button>
+                                ))}
+                            </div>
+                            <button onClick={startApp} className="w-full py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold text-lg transition">Continue</button>
+                        </div>
+                    </div>
+                );
+            }
 
-function renderCardGrid() {
-  const grid = document.getElementById('card-grid');
-  const countEl = document.getElementById('avail-count');
-  grid.innerHTML = '';
-  const assignedElsewhere = new Set();
-  pileAssignments.forEach((pa, i) => {
-    if (i !== activePileIndex) pa.forEach(c => assignedElsewhere.add(c));
-  });
-  let available = 0;
-  SUITS.forEach((suit, si) => {
-    RANKS.forEach(rank => {
-      const card = `${suit}-${rank}`;
-      if (assignedElsewhere.has(card)) return;
-      available++;
-      const chip = document.createElement('div');
-      chip.className = `card-chip ${SUIT_NAMES[si]}` + (pileAssignments[activePileIndex].includes(card) ? ' selected' : '');
-      chip.textContent = rank + suit;
-      chip.onclick = () => toggleCard(card);
-      grid.appendChild(chip);
-    });
-  });
-  countEl.textContent = `${available} cards available`;
-}
+            if (view === 'ASSIGN') {
+                const assignedGlobal = piles.flatMap(p => p.cards);
+                const availableCount = fullDeck.length - assignedGlobal.length;
 
-function renderPileCards() {
-  const list = document.getElementById('pile-card-list');
-  list.innerHTML = '';
-  pileAssignments[activePileIndex].forEach(card => {
-    const chip = document.createElement('div');
-    chip.className = `card-chip ${cardSuitClass(card)} selected`;
-    chip.textContent = card.startsWith('Joker') ? (card === 'Joker1' ? '🃏1' : '🃏2') : cardDisplayName(card);
-    chip.onclick = () => toggleCard(card);
-    list.appendChild(chip);
-  });
-}
+                return (
+                    <div className="p-6 max-w-6xl mx-auto h-screen flex flex-col">
+                        <header className="flex justify-between items-center mb-6">
+                            <div>
+                                <h1 className="text-2xl font-bold text-blue-400">Assign Cards: {piles[activePileIdx].name}</h1>
+                                <p className="text-sm text-gray-400">{availableCount} cards remaining in deck</p>
+                            </div>
+                            <div className="flex gap-3">
+                                <button onClick={() => setView('DECK_SELECT')} className="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600">Back</button>
+                                <button onClick={finalizeAssignments} className="px-6 py-2 bg-blue-600 hover:bg-blue-500 rounded font-bold">Save & Play</button>
+                            </div>
+                        </header>
 
-function toggleCard(card) {
-  const idx = pileAssignments[activePileIndex].indexOf(card);
-  if (idx === -1) {
-    pileAssignments[activePileIndex].push(card);
-  } else {
-    pileAssignments[activePileIndex].splice(idx, 1);
-    if (card === 'Joker1') jokerAssigned[0] = -1;
-    if (card === 'Joker2') jokerAssigned[1] = -1;
-  }
-  buildSuitQuickBtns();
-  renderCardGrid();
-  renderPileCards();
-}
+                        {/* Pile Tabs */}
+                        <div className="flex gap-2 mb-4">
+                            {piles.map((p, idx) => (
+                                <button key={idx} onClick={() => setActivePileIdx(idx)}
+                                    className={`px-4 py-2 rounded-t-lg border-b-2 transition ${activePileIdx === idx ? 'bg-gray-800 border-blue-500 text-blue-400 font-bold' : 'bg-gray-900 border-transparent text-gray-500'}`}>
+                                    {p.name} ({p.cards.length})
+                                </button>
+                            ))}
+                        </div>
 
-function goToPlay() {
-  piles = pileAssignments.map((pa, i) => ({
-    name: pileNames[i],
-    cards: shuffle([...pa]),
-    original: [...pa],
-    currentDrawn: null
-  }));
-  renderPlayScreen();
-  showScreen('play-screen');
-}
+                        {/* Control Panel */}
+                        <div className="flex flex-1 gap-6 overflow-hidden">
+                            <div className="w-64 bg-gray-800 rounded-xl p-4 flex flex-col gap-4">
+                                <h3 className="font-bold border-b border-gray-700 pb-2">Quick Add</h3>
+                                {deckType === 'STANDARD' ? (
+                                    STANDARD_SUITS.map(s => (
+                                        <button key={s} onClick={() => addSuit(s)} className="text-left px-3 py-2 bg-gray-700 rounded hover:bg-gray-600 text-sm">All {s}</button>
+                                    ))
+                                ) : (
+                                    <>
+                                        <button onClick={addMajorArcana} className="text-left px-3 py-2 bg-purple-900 hover:bg-purple-800 rounded text-sm font-bold">All Major Arcana</button>
+                                        {TAROT_SUITS.map(s => (
+                                            <button key={s} onClick={() => addSuit(s)} className="text-left px-3 py-2 bg-gray-700 rounded hover:bg-gray-600 text-sm">All {s}</button>
+                                        ))}
+                                    </>
+                                )}
+                                <div className="mt-auto">
+                                    <button onClick={() => setPiles(piles.map(p => ({...p, cards: []})))} className="w-full py-2 bg-red-900/50 text-red-200 rounded text-sm hover:bg-red-800">Clear All Piles</button>
+                                </div>
+                            </div>
 
-function renderPlayScreen() {
-  const grid = document.getElementById('piles-grid');
-  grid.innerHTML = '';
-  piles.forEach((pile, i) => {
-    const box = document.createElement('div');
-    box.className = 'pile-card-box';
-    box.innerHTML = `
-      <h3>${pile.name}</h3>
-      <div id="drawn-${i}" class="drawn-card empty-slot"></div>
-      <div id="stack-${i}" class="pile-stack ${pile.cards.length === 0 ? 'empty' : ''}" onclick="drawCard(${i})">
-        ${stackHTML(pile.cards.length)}
-      </div>
-      <button id="btn-${i}" class="select-btn" onclick="drawCard(${i})">🎴 Draw Card</button>
-      <button class="select-btn btn-blue" style="background:#2980b9;margin-top:6px;" onclick="openDrawSetModal(${i})">🎲 Draw a Set</button>
-    `;
-    grid.appendChild(box);
-    renderDrawnSlot(box.querySelector(`#drawn-${i}`), pile.currentDrawn);
-  });
-}
+                            <div className="flex-1 bg-gray-800 rounded-xl p-4 overflow-y-auto custom-scroll">
+                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2">
+                                    {fullDeck.map(card => {
+                                        const assignedToIdx = piles.findIndex(p => p.cards.includes(card.id));
+                                        const isAssignedToOther = assignedToIdx !== -1 && assignedToIdx !== activePileIdx;
+                                        const isAssignedHere = assignedToIdx === activePileIdx;
 
-function stackHTML(count) {
-  if (count === 0) return `<div><div class="pile-count">0</div><div class="pile-label">cards</div></div>`;
-  return `<div class="stack-overlay"><img class="card-back-img" src="${CARD_BACK_URL}" alt="card back"><div style="position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.6);border-radius:4px;padding:1px 5px;font-size:0.8rem;">${count}</div></div>`;
-}
+                                        return (
+                                            <div key={card.id} onClick={() => !isAssignedToOther && toggleCardInPile(card.id)}
+                                                className={`card-chip p-2 rounded text-xs flex justify-between items-center ${isAssignedHere ? 'selected' : isAssignedToOther ? 'disabled' : 'bg-gray-700'}`}>
+                                                <span className="truncate">{card.id}</span>
+                                                {isAssignedToOther && <span className="text-[10px] bg-black/40 px-1 rounded">P{assignedToIdx+1}</span>}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
 
-function renderDrawnSlot(el, card) {
-  if (!card) {
-    el.className = 'drawn-card empty-slot';
-    el.innerHTML = '';
-    return;
-  }
-  el.className = 'drawn-card';
-  if (card === 'Joker1' || card === 'Joker2') {
-    el.innerHTML = `<div class="joker-face">🃏</div>`;
-  } else {
-    const url = cardImageUrl(card);
-    el.innerHTML = `<img class="card-img" src="${url}" alt="${cardDisplayName(card)}">`;
-  }
-}
+            if (view === 'PLAY') {
+                return (
+                    <div className="p-8 h-screen flex flex-col">
+                        <header className="flex justify-between items-center mb-10">
+                            <h1 className="text-3xl font-bold flex items-center gap-4">
+                                {isEditingName ? (
+                                    <input autoFocus value={piles[activePileIdx].name} 
+                                        onChange={e => {
+                                            const np = [...piles]; np[activePileIdx].name = e.target.value; setPiles(np);
+                                        }}
+                                        onBlur={() => setIsEditingName(false)}
+                                        onKeyDown={e => e.key === 'Enter' && setIsEditingName(false)}
+                                        className="bg-gray-800 border-b-2 border-blue-500 outline-none px-2" />
+                                ) : (
+                                    <span onClick={() => setIsEditingName(true)} className="cursor-pointer hover:text-blue-400">
+                                        {piles[activePileIdx].name} <i className="fa-solid fa-pen text-sm opacity-30"></i>
+                                    </span>
+                                )}
+                            </h1>
+                            <div className="flex gap-4 items-center">
+                                <label className="flex items-center gap-2 text-sm bg-gray-800 px-3 py-2 rounded-lg cursor-pointer">
+                                    <input type="checkbox" checked={allowReversals} onChange={e => setAllowReversals(e.target.checked)} />
+                                    Allow Reversals
+                                </label>
+                                <button onClick={() => setView('ASSIGN')} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded">Edit Piles</button>
+                            </div>
+                        </header>
 
-function drawCard(pileIndex) {
-  const pile = piles[pileIndex];
-  if (pile.cards.length === 0) return;
-  pile.currentDrawn = pile.cards.pop();
-  const drawnEl = document.getElementById(`drawn-${pileIndex}`);
-  renderDrawnSlot(drawnEl, pile.currentDrawn);
-  const stackEl = document.getElementById(`stack-${pileIndex}`);
-  stackEl.className = 'pile-stack' + (pile.cards.length === 0 ? ' empty' : '');
-  stackEl.innerHTML = stackHTML(pile.cards.length);
-  const btn = document.getElementById(`btn-${pileIndex}`);
-  if (pile.cards.length === 0) {
-    btn.className = 'select-btn shuffle';
-    btn.textContent = '🔀 Shuffle Pile';
-    btn.onclick = () => reshufflePile(pileIndex);
-  }
-}
+                        <div className="flex-1 flex gap-8 overflow-x-auto pb-4 custom-scroll">
+                            {piles.map((pile, idx) => (
+                                <div key={idx} className={`min-w-[300px] flex flex-col items-center p-6 rounded-2xl border-2 transition-all ${activePileIdx === idx ? 'bg-gray-800/50 border-blue-500/50' : 'bg-gray-900 border-gray-800'}`} onClick={() => setActivePileIdx(idx)}>
+                                    <h3 className="font-bold mb-4 text-center">{pile.name}</h3>
 
-function reshufflePile(pileIndex) {
-  const pile = piles[pileIndex];
-  pile.cards = shuffle([...pile.original]);
-  pile.currentDrawn = null;
-  const drawnEl = document.getElementById(`drawn-${pileIndex}`);
-  renderDrawnSlot(drawnEl, null);
-  const stackEl = document.getElementById(`stack-${pileIndex}`);
-  stackEl.className = 'pile-stack';
-  stackEl.innerHTML = stackHTML(pile.cards.length);
-  const btn = document.getElementById(`btn-${pileIndex}`);
-  btn.className = 'select-btn';
-  btn.textContent = '🎴 Draw Card';
-  btn.onclick = () => drawCard(pileIndex);
-}
+                                    {/* Pile Visual */}
+                                    <div className="relative w-36 h-56 mb-6 flex items-center justify-center">
+                                        {pile.currentStack.length > 0 ? (
+                                            <>
+                                                <div className="absolute w-32 h-44 bg-blue-900 rounded-lg border-2 border-white translate-x-1 translate-y-1"></div>
+                                                <div className="absolute w-32 h-44 bg-blue-800 rounded-lg border-2 border-white">
+                                                    <div className="w-full h-full flex flex-col items-center justify-center opacity-30">
+                                                        <i className="fa-solid fa-layer-group text-3xl"></i>
+                                                        <div className="text-xl font-bold mt-2">{pile.currentStack.length}</div>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="w-32 h-44 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center text-gray-600">Empty</div>
+                                        )}
+                                    </div>
 
-// ── DRAW SET FEATURE ──────────────────────────────────────────
-let drawSetPileIndex = -1;
+                                    {/* Draw Controls */}
+                                    <div className="flex flex-col gap-2 w-full mt-auto">
+                                        {pile.currentStack.length > 0 ? (
+                                            <>
+                                                <button onClick={(e) => { e.stopPropagation(); drawOne(idx); }} className="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-lg font-bold">Draw One</button>
+                                                <button onClick={(e) => { e.stopPropagation(); triggerDrawSet(idx); }} className="w-full py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm">Draw a Set...</button>
+                                            </>
+                                        ) : (
+                                            <button onClick={(e) => { e.stopPropagation(); shufflePile(idx); }} className="w-full py-3 bg-green-700 hover:bg-green-600 rounded-lg font-bold"><i className="fa-solid fa-rotate-right mr-2"></i>Reshuffle</button>
+                                        )}
+                                    </div>
 
-function openDrawSetModal(pileIndex) {
-  const pile = piles[pileIndex];
-  drawSetPileIndex = pileIndex;
-  document.getElementById('draw-set-pile-name').textContent = `From: ${pile.name}`;
-  const maxCards = pile.cards.length;
-  const input = document.getElementById('draw-count-input');
-  input.max = maxCards;
-  input.value = Math.min(5, maxCards);
-  document.getElementById('draw-count-max').textContent = `(${maxCards} cards remaining in pile)`;
-  document.getElementById('draw-set-modal').classList.add('open');
-}
+                                    {/* Last Drawn Preview */}
+                                    {pile.drawn && (
+                                        <div className="mt-6 text-center animate-fade-in">
+                                            <p className="text-xs text-gray-500 mb-1">Drawn:</p>
+                                            <div className="w-24 h-36 bg-white rounded-lg shadow-xl mx-auto overflow-hidden border-2 border-blue-400">
+                                                <img src={getCardImage(pile.drawn)} alt="Drawn" className={`w-full h-full object-cover ${pile.drawn.isReversed ? 'reversed' : ''}`} />
+                                            </div>
+                                            <p className="text-sm font-bold mt-2 text-blue-300">
+                                                {pile.drawn.isReversed && "(R) "}{pile.drawn.id}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
 
-function closeDrawSetModal() {
-  document.getElementById('draw-set-modal').classList.remove('open');
-  drawSetPileIndex = -1;
-}
+                        {/* Modal */}
+                        {showDrawModal && (
+                            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+                                <div className="bg-gray-800 p-8 rounded-2xl w-80 text-center">
+                                    <h3 className="text-xl font-bold mb-4">Draw how many?</h3>
+                                    <input type="number" min="1" max={piles[activePileIdx].currentStack.length} value={drawCount} 
+                                        onChange={e => setDrawCount(Math.max(1, Math.min(parseInt(e.target.value) || 0, piles[activePileIdx].currentStack.length)))}
+                                        className="w-full p-2 bg-gray-700 rounded mb-6 text-center text-xl font-bold" />
+                                    <div className="flex gap-2">
+                                        <button onClick={() => setShowDrawModal(false)} className="flex-1 py-2 bg-gray-600 rounded">Cancel</button>
+                                        <button onClick={startReveal} className="flex-1 py-2 bg-blue-600 rounded font-bold">Start</button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+            }
 
-function confirmDrawSet() {
-  const pile = piles[drawSetPileIndex];
-  let count = parseInt(document.getElementById('draw-count-input').value) || 1;
-  count = Math.max(1, Math.min(count, pile.cards.length));
-  // Draw 'count' cards from the top of the pile
-  const drawn = pile.cards.splice(pile.cards.length - count, count);
-  // Shuffle the drawn set
-  const shuffled = shuffle(drawn);
-  closeDrawSetModal();
-  // Update pile display
-  const stackEl = document.getElementById(`stack-${drawSetPileIndex}`);
-  stackEl.className = 'pile-stack' + (pile.cards.length === 0 ? ' empty' : '');
-  stackEl.innerHTML = stackHTML(pile.cards.length);
-  const btn = document.getElementById(`btn-${drawSetPileIndex}`);
-  if (pile.cards.length === 0) {
-    btn.className = 'select-btn shuffle';
-    btn.textContent = '🔀 Shuffle Pile';
-    btn.onclick = () => reshufflePile(drawSetPileIndex);
-  }
-  // Go to reveal screen
-  startReveal(drawSetPileIndex, shuffled, drawn);
-}
+            if (view === 'REVEAL') {
+                const isFinished = revealIdx >= revealSet.length - 1;
+                const currentCard = revealIdx >= 0 ? revealSet[revealIdx] : null;
 
-function startReveal(pileIndex, shuffledDeck, originalDrawn) {
-  revealPileIndex = pileIndex;
-  revealDeck = shuffledDeck;
-  revealIndex = 0;
-  revealOriginal = originalDrawn;
-  document.getElementById('reveal-pile-title').textContent = `🎲 Set from: ${piles[pileIndex].name}`;
-  document.getElementById('reveal-info').textContent = `${shuffledDeck.length} cards drawn and shuffled. Reveal them one by one.`;
-  renderRevealScreen();
-  showScreen('reveal-screen');
-}
+                return (
+                    <div className="h-screen flex flex-col items-center justify-center p-8">
+                        <header className="mb-12 text-center">
+                            <h2 className="text-3xl font-bold text-blue-400 mb-2">Revealing {revealSet.length} cards</h2>
+                            <p className="text-gray-500">From {piles[activePileIdx].name}</p>
+                        </header>
 
-function renderRevealScreen() {
-  const slot = document.getElementById('reveal-slot');
-  slot.className = 'reveal-card-slot empty-slot';
-  slot.innerHTML = '';
-  document.getElementById('reveal-progress').textContent = `0 of ${revealDeck.length} revealed`;
-  const listEl = document.getElementById('drawn-set-list');
-  listEl.innerHTML = '';
-  revealDeck.forEach((card, i) => {
-    const chip = document.createElement('div');
-    chip.className = 'drawn-set-chip';
-    chip.id = `reveal-chip-${i}`;
-    chip.textContent = '?';
-    listEl.appendChild(chip);
-  });
-  const btn = document.getElementById('reveal-btn');
-  btn.style.display = '';
-  btn.textContent = '🃏 Reveal Next Card';
-}
+                        <div className="flex-1 flex flex-col items-center justify-center">
+                            <div className="w-64 h-96 bg-gray-900 rounded-3xl border-4 border-gray-800 shadow-[0_0_50px_rgba(0,0,0,0.5)] flex items-center justify-center mb-8 overflow-hidden relative">
+                                {currentCard ? (
+                                    <img src={getCardImage(currentCard)} className={`w-full h-full object-cover ${currentCard.isReversed ? 'reversed' : ''}`} alt="Card" />
+                                ) : (
+                                    <div className="text-gray-700 text-6xl"><i className="fa-solid fa-question"></i></div>
+                                )}
+                            </div>
 
-function revealNext() {
-  if (revealIndex >= revealDeck.length) return;
-  const card = revealDeck[revealIndex];
-  const slot = document.getElementById('reveal-slot');
-  slot.className = 'reveal-card-slot';
-  if (card === 'Joker1' || card === 'Joker2') {
-    slot.innerHTML = `<div class="reveal-joker">🃏</div>`;
-  } else {
-    const url = cardImageUrl(card);
-    slot.innerHTML = `<img class="reveal-card-img" src="${url}" alt="${cardDisplayName(card)}">`;
-  }
-  // Update chip
-  const chip = document.getElementById(`reveal-chip-${revealIndex}`);
-  chip.textContent = cardDisplayName(card);
-  chip.classList.add('revealed');
-  revealIndex++;
-  document.getElementById('reveal-progress').textContent = `${revealIndex} of ${revealDeck.length} revealed`;
-  if (revealIndex >= revealDeck.length) {
-    document.getElementById('reveal-btn').textContent = '✅ All Revealed';
-    document.getElementById('reveal-btn').disabled = true;
-  }
-}
+                            <div className="flex flex-wrap gap-2 justify-center max-w-lg mb-8">
+                                {revealSet.map((c, i) => (
+                                    <div key={i} className={`w-3 h-3 rounded-full ${i <= revealIdx ? 'bg-blue-500' : 'bg-gray-700'}`}></div>
+                                ))}
+                            </div>
 
-function backToPlay() {
-  showScreen('play-screen');
-}
+                            <div className="flex gap-4">
+                                {isFinished ? (
+                                    <button onClick={() => setView('PLAY')} className="px-8 py-4 bg-green-600 hover:bg-green-500 rounded-xl font-bold text-xl shadow-lg">Back to Piles</button>
+                                ) : (
+                                    <button onClick={() => setRevealIdx(revealIdx + 1)} className="px-12 py-4 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold text-xl shadow-lg animate-pulse">Reveal Next</button>
+                                )}
+                            </div>
+                        </div>
 
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-</script>
+                        {currentCard && (
+                            <div className="mt-4 text-2xl font-bold text-white mb-20 animate-fade-in">
+                                {currentCard.isReversed && <span className="text-red-400 mr-2">Reversed:</span>}
+                                {currentCard.id}
+                            </div>
+                        )}
+                    </div>
+                );
+            }
+
+            return null;
+        };
+
+        ReactDOM.render(<App />, document.getElementById('artifact_react'));
+    </script>
 </body>
 </html>
